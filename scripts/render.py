@@ -249,13 +249,21 @@ def shot_frames(spec, reader, edl, tl, info=None):
     z0, z1 = cam.get("zoom", [1, 1])
     center = cam.get("center", [0.5, 0.5])
     center_end = cam.get("center_end", center)
-    zease = ease_inout if cam.get("ease") == "inout" else (lambda u: u)
+    zease = {"inout": ease_inout,
+             "out": lambda u: 1 - (1 - u) ** 3,   # fast start, settles (pull-back reveals)
+             "in": lambda u: u ** 3}.get(cam.get("ease"), lambda u: u)
     shutter = spec.get("shutter", 0.5)
     pre = align_matrix(spec, cam, reader, edl, info) if info else None
     for k in range(n):
-        if "out" in spec:  # speed ramp: slow -> fast -> slow, covering [in, out] in `dur`
+        if "out" in spec:  # speed ramp covering [in, out] in `dur`
             a = spec.get("ramp", 0.7)
-            f = lambda u: u - a * math.sin(2 * math.pi * u) / (2 * math.pi)
+            shape = spec.get("ramp_shape", "bell")
+            if shape == "out":    # fast -> slow: decelerate after a cut
+                f = lambda u: (1 + a) * u - a * u * u
+            elif shape == "in":   # slow -> fast: accelerate into the next cut
+                f = lambda u: (1 - a) * u + a * u * u
+            else:                 # slow -> fast -> slow
+                f = lambda u: u - a * math.sin(2 * math.pi * u) / (2 * math.pi)
             span = spec["out"] - spec["in"]
             ta = spec["in"] + span * f(k / n)
             tb = spec["in"] + span * f((k + 1) / n)

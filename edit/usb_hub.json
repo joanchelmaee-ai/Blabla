@@ -6,25 +6,25 @@
     "hub": "raw/proxy/clip_11253.mp4"
   },
   "shots": [
-    {"id": "hook",      "src": "hub", "in": 2.00,  "speed": 0.6, "dur": 2.80, "zoom": [1.15, 1.05], "center": [0.45, 0.6]},
-    {"id": "ports",     "src": "hub", "in": 15.00, "speed": 0.6, "dur": 2.60, "zoom": [1.35, 1.46], "center": [0.55, 0.65],
-     "trans_in": {"type": "zoom", "frames": 6, "focus_out": [0.45, 0.62], "focus_in": [0.55, 0.65]}},
-    {"id": "ports_up",  "src": "hub", "in": 26.50, "speed": 0.6, "dur": 1.80, "zoom": [1.30, 1.38], "center": [0.55, 0.45],
-     "trans_in": {"type": "blur", "frames": 6}},
-    {"id": "turn",      "src": "hub", "in": 31.00, "out": 34.60, "ramp": 0.7, "dur": 1.00, "zoom": [1.30, 1.30], "center": [0.55, 0.45],
-     "trans_in": {"type": "pop", "frames": 3}},
-    {"id": "connector", "src": "hub", "in": 54.00, "speed": 0.6, "dur": 2.40, "zoom": [1.30, 1.42], "center": [0.5, 0.48],
-     "trans_in": {"type": "blur", "frames": 9}},
-    {"id": "set_down",  "src": "hub", "in": 71.60, "out": 75.60, "ramp": 0.7, "dur": 1.10, "zoom": [1.04, 1.04], "center": [0.5, 0.7],
-     "trans_in": {"type": "zoom", "frames": 6, "focus_out": [0.5, 0.48], "focus_in": [0.4, 0.75]}},
-    {"id": "final",     "src": "hub", "in": 76.50, "speed": 1.0, "dur": 4.00, "zoom": [1.04, 1.24], "center": [0.5, 0.7], "center_end": [0.58, 0.8],
-     "ease": "inout", "trans_in": {"type": "pop", "frames": 3}, "fade_out": 10}
+    {"id": "hook",      "src": "hub", "in": 0.85,  "out": 2.75, "ramp_shape": "out", "ramp": 0.75, "dur": 1.20,
+     "zoom": [1.16, 1.06], "ease": "out", "center": [0.5, 0.6]},
+    {"id": "ports",     "src": "hub", "in": 25.80, "out": 27.80, "ramp_shape": "out", "ramp": 0.6, "dur": 1.20,
+     "zoom": [1.32, 1.40], "center": [0.55, 0.45],
+     "trans_in": {"type": "zoom", "frames": 4, "focus_out": [0.5, 0.62], "focus_in": [0.55, 0.45]}},
+    {"id": "turn",      "src": "hub", "in": 31.00, "out": 34.60, "ramp": 0.7, "dur": 0.70, "zoom": [1.36, 1.36], "center": [0.55, 0.45],
+     "trans_in": {"type": "pop", "frames": 2}},
+    {"id": "connector", "src": "hub", "in": 54.90, "speed": 1.0, "dur": 1.20, "zoom": [1.30, 1.38], "center": [0.5, 0.45],
+     "trans_in": {"type": "zoom", "frames": 4, "focus_out": [0.55, 0.45], "focus_in": [0.5, 0.45]}},
+    {"id": "set_down",  "src": "hub", "in": 72.60, "out": 75.60, "ramp_shape": "in", "ramp": 0.6, "dur": 0.80,
+     "zoom": [1.06, 1.06], "center": [0.5, 0.7], "trans_in": {"type": "pop", "frames": 2}},
+    {"id": "final",     "src": "hub", "in": 79.20, "speed": 1.0, "dur": 2.50, "zoom": [1.06, 1.22], "ease": "out",
+     "center": [0.5, 0.7], "center_end": [0.58, 0.8], "trans_in": {"type": "pop", "frames": 3}, "fade_out": 8}
   ],
   "sfx": [
-    {"type": "whoosh", "at": "ports",     "offset": -0.15, "gain": 0.7},
-    {"type": "whoosh", "at": "ports_up",  "offset": -0.12, "gain": 0.4},
-    {"type": "whoosh", "at": "connector", "offset": -0.15, "gain": 0.4},
-    {"type": "whoosh", "at": "set_down",  "offset": -0.15, "gain": 0.7},
-    {"type": "click",  "at": "final",     "offset": -0.05, "gain": 0.8}
+    {"type": "whoosh", "at": "ports",     "offset": -0.12, "gain": 0.7},
+    {"type": "whoosh", "at": "turn",      "offset": -0.05, "gain": 0.35},
+    {"type": "whoosh", "at": "connector", "offset": -0.12, "gain": 0.6},
+    {"type": "whoosh", "at": "set_down",  "offset": 0.1,   "gain": 0.45},
+    {"type": "click",  "at": "final",     "offset": -0.03, "gain": 0.9}
   ]
 }

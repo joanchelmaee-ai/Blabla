@@ -1,0 +1,26 @@
+{
+  "fps": 30,
+  "size": [1080, 1920],
+  "typography": false,
+  "sources": {
+    "wide": "raw/proxy/clip_11315.mp4",
+    "mid": "raw/proxy/clip_11316.mp4",
+    "close": "raw/proxy/clip_11317.mp4"
+  },
+  "shots": [
+    {"id": "hook",   "src": "close", "in": 0.30, "speed": 1.0, "dur": 1.50, "zoom": [1.55, 1.12], "ease": "out",
+     "center": [0.63, 0.76], "center_end": [0.55, 0.66]},
+    {"id": "detail", "src": "mid",   "in": 0.40, "speed": 1.0, "dur": 0.90, "zoom": [1.45, 1.52], "center": [0.78, 0.7],
+     "trans_in": {"type": "zoom", "frames": 4, "focus_out": [0.6, 0.72], "focus_in": [0.78, 0.7]}},
+    {"id": "mid",    "src": "mid",   "in": 2.60, "speed": 1.0, "dur": 1.50, "zoom": [1.14, 1.22], "center": [0.56, 0.66], "center_end": [0.6, 0.7],
+     "trans_in": {"type": "blur", "frames": 5}},
+    {"id": "wide",   "src": "wide",  "in": 1.50, "speed": 1.0, "dur": 2.50, "zoom": [1.04, 1.20], "ease": "out",
+     "center": [0.55, 0.62], "center_end": [0.62, 0.68],
+     "trans_in": {"type": "zoom", "frames": 4, "focus_out": [0.6, 0.72], "focus_in": [0.62, 0.68]}, "fade_out": 8}
+  ],
+  "sfx": [
+    {"type": "whoosh", "at": "detail", "offset": -0.12, "gain": 1.3},
+    {"type": "whoosh", "at": "mid",    "offset": -0.10, "gain": 0.7},
+    {"type": "whoosh", "at": "wide",   "offset": -0.12, "gain": 1.3}
+  ]
+}
