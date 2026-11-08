@@ -1,0 +1,202 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Stack Edit Type</title>
+<style>
+  /* Free stand-ins: Montserrat = Gotham, Syne = Advercase, Pinyon Script = cursive.
+     Drop real Gotham / Advercase files in type/fonts and point these @font-face rules at them. */
+  @font-face { font-family: "Gotham"; src: url(fonts/montserrat-latin-300-normal.woff2); font-weight: 300; }
+  @font-face { font-family: "Gotham"; src: url(fonts/montserrat-latin-500-normal.woff2); font-weight: 500; }
+  @font-face { font-family: "Gotham"; src: url(fonts/montserrat-latin-700-normal.woff2); font-weight: 700; }
+  @font-face { font-family: "Advercase"; src: url(fonts/syne-latin-800-normal.woff2); font-weight: 800; }
+  @font-face { font-family: "Script"; src: url(fonts/pinyon-script-latin-400-normal.woff2); }
+
+  :root {
+    --ink: #1f1a16;
+    --bronze: #8a6a42;
+    --muted: rgba(31, 26, 22, .72);
+  }
+  html, body { margin: 0; width: 1080px; height: 1920px; background: transparent; overflow: hidden; }
+  body { position: relative; -webkit-font-smoothing: antialiased; }
+
+  .abs { position: absolute; white-space: nowrap; will-change: transform, opacity; opacity: 0; }
+  .script { font-family: "Script"; color: var(--bronze); line-height: 1.25; padding: 0 40px 10px 18px; margin-left: -18px; }
+  .display { font-family: "Advercase"; font-weight: 800; color: var(--ink); line-height: .86; letter-spacing: -.035em; }
+  .label { font-family: "Gotham"; font-weight: 500; color: var(--ink); letter-spacing: .42em; text-transform: uppercase; }
+  .thin { font-weight: 500; color: var(--muted); }
+  .rule { height: 2px; background: var(--ink); transform-origin: left center; }
+  .rule.r { transform-origin: right center; }
+  .line { display: inline-block; overflow: hidden; vertical-align: top; padding-top: .06em; }
+  .ch { display: inline-block; will-change: transform; }
+  .bars { display: flex; gap: 10px; }
+  .bars i { display: block; width: 38px; height: 3px; background: rgba(31,26,22,.18); position: relative; overflow: hidden; }
+  .bars i b { position: absolute; inset: 0; background: var(--ink); transform-origin: left; transform: scaleX(0); }
+  .right { text-align: right; }
+</style>
+</head>
+<body>
+
+<!-- ============ HOOK: build my STACK with me ============ -->
+<div id="h_tag"   class="abs label thin" style="right:150px; top:176px; font-size:23px;">N° 05 pieces</div>
+<div id="h_build" class="abs script"     style="left:96px; top:128px; font-size:118px; transform-origin:left;">build my</div>
+<div id="h_stack" class="abs display"    style="left:88px; top:262px; font-size:236px;" data-fit="800">STACK</div>
+<div id="h_with"  class="abs script"     style="left:560px; top:392px; font-size:104px;">with me</div>
+
+<!-- ============ BUILD: numbered layers ============ -->
+<div id="c_box" style="position:absolute; left:500px; top:965px;">
+  <div id="c_n1" class="abs label" style="left:0; top:0; font-size:26px;">N° 01</div>
+  <div id="c_s1" class="abs script" style="left:0; top:34px; font-size:92px;" data-fit="478">the clover</div>
+  <div id="c_n2" class="abs label" style="left:0; top:0; font-size:26px;">N° 02</div>
+  <div id="c_s2" class="abs script" style="left:0; top:34px; font-size:92px;" data-fit="478">the tennis</div>
+  <div id="c_n3" class="abs label" style="left:0; top:0; font-size:26px;">N° 03</div>
+  <div id="c_s3" class="abs script" style="left:0; top:34px; font-size:92px;" data-fit="478">the snake chain</div>
+  <div id="c_n4" class="abs label" style="left:0; top:0; font-size:26px;">N° 04</div>
+  <div id="c_s4" class="abs script" style="left:0; top:34px; font-size:92px;" data-fit="478">the woven chain</div>
+  <div id="c_n5" class="abs label" style="left:0; top:0; font-size:26px;">N° 05</div>
+  <div id="c_s5" class="abs script" style="left:0; top:34px; font-size:92px;" data-fit="478">the pearl clover</div>
+  <div id="c_bars" class="abs bars" style="left:2px; top:196px;"><i><b></b></i><i><b></b></i><i><b></b></i><i><b></b></i><i><b></b></i></div>
+</div>
+
+<!-- ============ REVEAL: 05 pieces, one stack ============ -->
+<div id="r_num"   class="abs display right" style="right:150px; top:770px; font-size:210px;">05</div>
+<div id="r_script" class="abs script right" style="right:110px; top:930px; font-size:80px;">pieces, one stack</div>
+<div id="r_rule"  class="abs rule r" style="right:150px; top:1052px; width:84px;"></div>
+<div id="r_small" class="abs label thin right" style="right:150px; top:1066px; font-size:21px; letter-spacing:.3em; margin-right:-.3em;">non-tarnish · made to layer</div>
+
+<!-- ============ DETAIL annotation ============ -->
+<div id="d_fig"   class="abs label" style="left:98px; top:318px; font-size:24px;">fig. 01 — the finish</div>
+<div id="d_rule"  class="abs rule" style="left:100px; top:362px; width:64px;"></div>
+<div id="d_script" class="abs script" style="left:96px; top:372px; font-size:104px;">non-tarnish</div>
+
+<!-- ============ END CARD ============ -->
+<div id="e_script" class="abs script"  style="left:96px; top:132px; font-size:122px;">effortless,</div>
+<div id="e_always" class="abs display" style="left:226px; top:284px; font-size:132px;" data-fit="680">ALWAYS.</div>
+<div id="e_rule"   class="abs rule"    style="left:232px; top:462px; width:70px;"></div>
+<div id="e_link"   class="abs label"   style="left:322px; top:449px; font-size:24px;">linked below</div>
+
+<script>
+const TL = window.__TL || {fps: 30, duration: 16, shots: []};
+const shot = id => TL.shots.find(s => s.id === id) || {start: 0, dur: 0};
+const st = id => shot(id).start;
+const en = id => shot(id).start + shot(id).dur;
+
+const clamp = x => Math.max(0, Math.min(1, x));
+const expo = x => x >= 1 ? 1 : 1 - Math.pow(2, -10 * x);
+const cubic = x => 1 - Math.pow(1 - x, 3);
+const inout = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const $ = id => document.getElementById(id);
+
+// fit long words to a max width, split display words into masked letters
+function prepare() {
+  document.querySelectorAll('[data-fit]').forEach(el => {
+    const max = +el.dataset.fit;
+    let fs = parseFloat(el.style.fontSize);
+    el.style.opacity = 1;
+    while (el.getBoundingClientRect().width > max && fs > 20) { fs -= 2; el.style.fontSize = fs + 'px'; }
+    el.style.opacity = 0;
+  });
+  document.querySelectorAll('.display').forEach(el => {
+    const txt = el.textContent;
+    el.innerHTML = '<span class="line">' + [...txt].map(c => `<span class="ch">${c === ' ' ? '&nbsp;' : c}</span>`).join('') + '</span>';
+  });
+}
+
+// cue types ---------------------------------------------------------------
+// letters: staggered masked rise   wipe: handwriting-style left->right reveal
+// rise: soft fade + lift + de-blur rule: draw line   all exit with a soft lift + fade
+const CUES = [];
+const cue = (id, type, tin, tout, o = {}) => CUES.push({id, type, tin, tout, dur: o.dur || .5, stag: o.stag || .045, exit: o.exit || .18});
+
+function build() {
+  const hook = en('hook');
+  cue('h_tag', 'rise', .10, hook, {dur: .5});
+  cue('h_build', 'wipe', .12, hook, {dur: .6});
+  cue('h_stack', 'letters', .28, hook, {dur: .6, stag: .055});
+  cue('h_with', 'wipe', .78, hook, {dur: .55});
+
+  const marks = [st('n01'), st('n02_act'), st('n03_act'), st('n04'), st('n05_act')];
+  const endBuild = st('reveal') + .2;
+  marks.forEach((t, i) => {
+    const out = i < 4 ? marks[i + 1] : endBuild;
+    const first = i === 0;
+    cue('c_n' + (i + 1), 'rise', t + (first ? .12 : 0), out, {dur: .3, exit: .1});
+    cue('c_s' + (i + 1), 'wipe', t + (first ? .18 : .04), out, {dur: first ? .5 : .32, exit: .1});
+  });
+  CUES.push({id: 'c_bars', type: 'bars', tin: st('n01') + .2, tout: endBuild, exit: .18, marks});
+
+  const r0 = st('reveal'), r1 = en('reveal') - .05;
+  cue('r_num', 'letters', r0 + .32, r1, {dur: .65, stag: .09, exit: .25});
+  cue('r_script', 'wipe', r0 + .62, r1, {dur: .6, exit: .25});
+  cue('r_rule', 'rule', r0 + .9, r1, {dur: .45, exit: .25});
+  cue('r_small', 'rise', r0 + .98, r1, {dur: .5, exit: .25});
+
+  const d0 = st('detail_a'), d1 = en('detail_a') - .12;
+  cue('d_fig', 'rise', d0 + .3, d1, {dur: .45});
+  cue('d_rule', 'rule', d0 + .38, d1, {dur: .4});
+  cue('d_script', 'wipe', d0 + .45, d1, {dur: .55});
+
+  const e0 = st('endcard'), e1 = TL.duration;
+  cue('e_script', 'wipe', e0 + .25, e1, {dur: .75, exit: .3});
+  cue('e_always', 'letters', e0 + .62, e1, {dur: .6, stag: .05, exit: .3});
+  cue('e_rule', 'rule', e0 + 1.1, e1, {dur: .45, exit: .3});
+  cue('e_link', 'rise', e0 + 1.18, e1, {dur: .5, exit: .3});
+}
+
+function render(t) {
+  for (const c of CUES) {
+    const el = $(c.id);
+    if (t < c.tin || t > c.tout) { el.style.opacity = 0; continue; }
+    const p = clamp((t - c.tin) / (c.dur || .5));
+    const x = clamp((t - (c.tout - c.exit)) / c.exit);       // exit progress
+    const xo = 1 - cubic(x), xy = -14 * cubic(x), xb = 5 * x;
+    let base = '';
+    if (c.type === 'rise') {
+      const e = cubic(p);
+      el.style.opacity = e * xo;
+      el.style.transform = `translateY(${(1 - e) * 18 + xy}px)`;
+      el.style.filter = `blur(${(1 - e) * 6 + xb}px)`;
+    } else if (c.type === 'wipe') {
+      const e = inout(p);
+      const pos = -18 + 128 * e;
+      const m = `linear-gradient(90deg, #000 0%, #000 ${pos}%, transparent ${pos + 18}%)`;
+      el.style.webkitMaskImage = m; el.style.maskImage = m;
+      el.style.opacity = xo;
+      el.style.transform = `translate(${(1 - cubic(p)) * -10}px, ${xy}px)` + (el.id === 'h_build' || el.id === 'e_script' ? ' rotate(-4deg)' : '');
+      el.style.filter = `blur(${xb}px)`;
+    } else if (c.type === 'letters') {
+      el.style.opacity = xo;
+      el.style.transform = `translateY(${xy}px)`;
+      el.style.filter = `blur(${xb}px)`;
+      el.querySelectorAll('.ch').forEach((ch, i) => {
+        const q = expo(clamp((t - c.tin - i * c.stag) / c.dur));
+        ch.style.transform = `translateY(${(1 - q) * 105}%)`;
+      });
+    } else if (c.type === 'rule') {
+      const e = inout(p);
+      el.style.opacity = xo;
+      el.style.transform = `scaleX(${e})`;
+    } else if (c.type === 'bars') {
+      const e = cubic(p);
+      el.style.opacity = e * xo;
+      el.style.transform = `translateY(${xy}px)`;
+      el.querySelectorAll('b').forEach((b, i) => {
+        const q = inout(clamp((t - c.marks[i] - .05) / .3));
+        b.style.transform = `scaleX(${q})`;
+      });
+    }
+  }
+}
+
+window.ready = (async () => {
+  await document.fonts.ready;
+  await Promise.all([...document.fonts].map(f => f.load()));
+  prepare();
+  build();
+  render(0);
+  return true;
+})();
+window.render = render;
+</script>
+</body>
+</html>

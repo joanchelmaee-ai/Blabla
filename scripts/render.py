@@ -1,0 +1,373 @@
+#!/usr/bin/env python3
+"""Render the editorial TikTok edit described in edit/edl.json.
+
+Pipeline
+  1. timeline   - resolve shot start times (dissolves overlap), write build/timeline.json
+  2. type       - render the kinetic typography overlay (scripts/render_type.js -> build/type/*.png)
+  3. audio      - synthesize the "silent-ready" sound bed (room tone + soft clinks/whooshes)
+  4. video      - cut / speed-ramp (with real shutter blur) / zoom / transitions in numpy,
+                  piped into ffmpeg which applies the shared grade (edit/grade.txt),
+                  composites the typography, adds grain and encodes 1080x1920 H.264.
+
+Usage:  python3 scripts/render.py [--skip-type] [--out out/final_1080x1920.mp4]
+"""
+import argparse
+import json
+import math
+import os
+import subprocess
+import sys
+import wave
+from collections import OrderedDict
+
+import cv2
+import numpy as np
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BUILD = os.path.join(ROOT, "build")
+
+
+def rel(p):
+    return os.path.join(ROOT, p)
+
+
+# --------------------------------------------------------------------------- probe
+def probe(path):
+    out = subprocess.run(
+        ["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries",
+         "stream=width,height,r_frame_rate,color_transfer:stream_side_data=rotation",
+         "-of", "json", path], capture_output=True, text=True, check=True).stdout
+    s = json.loads(out)["streams"][0]
+    num, den = s["r_frame_rate"].split("/")
+    rot = 0
+    for sd in s.get("side_data_list", []) or []:
+        if "rotation" in sd:
+            rot = int(sd["rotation"])
+    w, h = s["width"], s["height"]
+    if rot in (90, -90, 270, -270):
+        w, h = h, w
+    hdr = s.get("color_transfer") in ("smpte2084", "arib-std-b67")
+    return {"w": w, "h": h, "fps": float(num) / float(den), "hdr": hdr}
+
+
+# --------------------------------------------------------------------------- source reader
+MAX_WORK = (1440, 2560)  # decode cap: plenty of headroom for push-ins on 4K originals
+
+
+class SourceReader:
+    """Streams RGB frames forward from `start` seconds; random access within a sliding cache."""
+
+    def __init__(self, path, start, info):
+        self.info = info
+        self.fps = info["fps"]
+        w, h = info["w"], info["h"]
+        scale = min(1.0, MAX_WORK[0] / w, MAX_WORK[1] / h)
+        self.w, self.h = int(round(w * scale / 2) * 2), int(round(h * scale / 2) * 2)
+        self.base = max(0.0, start - 0.05)
+        vf = []
+        if info["hdr"]:  # iPhone HLG/PQ originals -> SDR bt709
+            vf.append("zscale=t=linear:npl=203,format=gbrpf32le,tonemap=hable:desat=0,"
+                      "zscale=p=bt709:t=bt709:m=bt709:r=tv")
+        vf.append(f"scale={self.w}:{self.h}:flags=lanczos:in_color_matrix=bt709:in_range=tv")
+        vf.append("format=rgb24")
+        cmd = ["ffmpeg", "-v", "error", "-ss", f"{self.base:.4f}", "-i", path,
+               "-vf", ",".join(vf), "-an", "-f", "rawvideo", "-pix_fmt", "rgb24", "-"]
+        self.proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+        self.fsize = self.w * self.h * 3
+        self.cache = OrderedDict()
+        self.next_idx = 0
+        self.last = None
+
+    def _read_one(self):
+        buf = self.proc.stdout.read(self.fsize)
+        if len(buf) < self.fsize:
+            return None
+        return np.frombuffer(buf, np.uint8).reshape(self.h, self.w, 3)
+
+    def frame_at_index(self, idx):
+        while self.next_idx <= idx:
+            f = self._read_one()
+            if f is None:  # past end of clip: hold last frame
+                f = self.last
+                if f is None:
+                    raise RuntimeError("source produced no frames")
+            self.cache[self.next_idx] = f
+            self.last = f
+            self.next_idx += 1
+            while len(self.cache) > 90:
+                self.cache.popitem(last=False)
+        if idx in self.cache:
+            return self.cache[idx]
+        return self.cache[next(iter(self.cache))]
+
+    def index(self, t):
+        return max(0, int(round((t - self.base) * self.fps)))
+
+    def blended(self, t0, t1):
+        """Mean of source frames whose timestamps fall in [t0, t1] (virtual shutter)."""
+        i0, i1 = self.index(t0), self.index(t1)
+        if i1 <= i0:
+            return self.frame_at_index(i0)
+        acc = np.zeros((self.h, self.w, 3), np.float32)
+        for i in range(i0, i1 + 1):
+            acc += self.frame_at_index(i)
+        return (acc / (i1 - i0 + 1)).astype(np.uint8)
+
+    def close(self):
+        try:
+            self.proc.stdout.close()
+            self.proc.kill()
+        except Exception:
+            pass
+
+
+# --------------------------------------------------------------------------- helpers
+def ease_inout(u):
+    return u * u * (3 - 2 * u)
+
+
+def lerp(a, b, u):
+    return a + (b - a) * u
+
+
+def warp_view(img, zoom, center, out_w, out_h, upscale):
+    """Sub-pixel crop (9:16) + resize in one affine warp, so slow zooms never jitter."""
+    h, w = img.shape[:2]
+    target = out_w / out_h
+    if w / h > target:
+        bh, bw = h, h * target
+    else:
+        bw, bh = w, w / target
+    cw, ch = bw / zoom, bh / zoom
+    cx = min(max(center[0] * w, cw / 2), w - cw / 2)
+    cy = min(max(center[1] * h, ch / 2), h - ch / 2)
+    x0, y0 = cx - cw / 2, cy - ch / 2
+    s = out_w / cw
+    m = np.array([[s, 0, -x0 * s], [0, s, -y0 * s]], np.float32)
+    interp = cv2.INTER_LANCZOS4 if s > 1 else cv2.INTER_AREA
+    out = cv2.warpAffine(img, m, (out_w, out_h), flags=interp, borderMode=cv2.BORDER_REFLECT)
+    if s > 1.15:  # recover some crispness lost to upscaling (proxies); gentle on originals
+        amt = min(0.9, 0.35 * (s - 1.0))
+        blur = cv2.GaussianBlur(out, (0, 0), 1.6)
+        out = cv2.addWeighted(out, 1 + amt, blur, -amt, 0)
+    return out
+
+
+def motion_blur(img, length, dx):
+    if length < 2:
+        return img
+    k = np.zeros((1, int(length)), np.float32)
+    k[:] = 1.0 / int(length)
+    blurred = cv2.filter2D(img, -1, k)
+    m = np.array([[1, 0, dx], [0, 1, 0]], np.float32)
+    return cv2.warpAffine(blurred, m, (img.shape[1], img.shape[0]), borderMode=cv2.BORDER_REFLECT)
+
+
+# --------------------------------------------------------------------------- timeline
+def build_timeline(edl):
+    fps = edl["fps"]
+    shots, t = [], 0
+    for s in edl["shots"]:
+        n = int(round(s["dur"] * fps))
+        ov = s.get("trans_in", {}).get("frames", 0) if s.get("trans_in", {}).get("type") == "dissolve" else 0
+        start = t - ov
+        shots.append({"id": s["id"], "start_frame": start, "frames": n,
+                      "start": start / fps, "dur": n / fps})
+        t = start + n
+    return {"fps": fps, "size": edl["size"], "total_frames": t, "duration": t / fps, "shots": shots}
+
+
+def shot_frames(spec, reader, fps, size):
+    """Yield the output frames of one shot."""
+    n = int(round(spec["dur"] * fps))
+    out_w, out_h = size
+    z0, z1 = spec.get("zoom", [1, 1])
+    center = spec.get("center", [0.5, 0.5])
+    center_end = spec.get("center_end", center)
+    zease = ease_inout if spec.get("ease") == "inout" else (lambda u: u)
+    shutter = spec.get("shutter", 0.5)
+    for k in range(n):
+        if "out" in spec:  # speed ramp: slow -> fast -> slow, covering [in, out] in `dur`
+            a = spec.get("ramp", 0.7)
+            f = lambda u: u - a * math.sin(2 * math.pi * u) / (2 * math.pi)
+            span = spec["out"] - spec["in"]
+            ta = spec["in"] + span * f(k / n)
+            tb = spec["in"] + span * f((k + 1) / n)
+        else:
+            sp = spec.get("speed", 1.0)
+            ta = spec["in"] + k / fps * sp
+            tb = ta + sp / fps
+        src = reader.blended(ta, ta + shutter * (tb - ta))
+        u = k / max(1, n - 1)
+        e = zease(u)
+        c = (lerp(center[0], center_end[0], e), lerp(center[1], center_end[1], e))
+        yield warp_view(src, lerp(z0, z1, e), c, out_w, out_h, True)
+
+
+def video_frames(edl, tl):
+    fps, size = edl["fps"], edl["size"]
+    infos = {k: probe(rel(v)) for k, v in edl["sources"].items()}
+    pending = []  # frames held back for a dissolve into the next shot
+    shots = edl["shots"]
+    for si, spec in enumerate(shots):
+        reader = SourceReader(rel(edl["sources"][spec["src"]]), spec["in"], infos[spec["src"]])
+        frames = shot_frames(spec, reader, fps, size)
+        tin = spec.get("trans_in", {})
+        nxt = shots[si + 1] if si + 1 < len(shots) else None
+        ntr = (nxt or {}).get("trans_in", {})
+        hold = ntr.get("frames", 0) if ntr.get("type") == "dissolve" else 0
+        whip_out = ntr.get("frames", 0) if ntr.get("type") == "whip" else 0
+        n = int(round(spec["dur"] * fps))
+        fade_out = spec.get("fade_out", 0)
+        tail = []
+        n_pend = len(pending)
+        for k, fr in enumerate(frames):
+            # incoming transition
+            if tin.get("type") == "dissolve" and pending:
+                a = ease_inout((k + 1) / (n_pend + 1))
+                prev = pending.pop(0)
+                fr = cv2.addWeighted(prev, 1 - a, fr, a, 0)
+            elif tin.get("type") == "whip" and k < tin["frames"]:
+                p = 1 - k / tin["frames"]  # strongest right after the cut
+                fr = motion_blur(fr, 1 + 140 * p, 90 * p)
+            # outgoing transition
+            if whip_out and k >= n - whip_out:
+                p = (k - (n - whip_out) + 1) / whip_out
+                fr = motion_blur(fr, 1 + 140 * p, -90 * p)
+            if fade_out and k >= n - fade_out:
+                a = (k - (n - fade_out) + 1) / fade_out
+                paper = np.full_like(fr, (246, 243, 238))
+                fr = cv2.addWeighted(fr, 1 - ease_inout(a), paper, ease_inout(a), 0)
+            if hold and k >= n - hold:
+                tail.append(fr)
+                continue
+            yield fr
+        reader.close()
+        pending = tail
+
+
+# --------------------------------------------------------------------------- audio
+SR = 48000
+
+
+def synth_audio(edl, tl, path):
+    total = tl["duration"]
+    n = int(total * SR) + SR // 2
+    rng = np.random.default_rng(7)
+    mix = np.zeros((n, 2), np.float32)
+
+    # soft room tone (pink-ish noise, low-passed) so the clip never sounds dead
+    white = rng.standard_normal(n).astype(np.float32)
+    spec = np.fft.rfft(white)
+    freqs = np.fft.rfftfreq(n, 1 / SR)
+    shape = 1 / np.sqrt(np.maximum(freqs, 20)) * (1 / (1 + (freqs / 2500) ** 2))
+    room = np.fft.irfft(spec * shape, n).astype(np.float32)
+    room *= 10 ** (-50 / 20) / (np.sqrt(np.mean(room ** 2)) + 1e-9)
+    mix += room[:, None]
+
+    starts = {s["id"]: s["start"] for s in tl["shots"]}
+
+    def clink(gain):
+        d = int(0.6 * SR)
+        t = np.arange(d) / SR
+        out = np.zeros(d, np.float32)
+        f0 = rng.uniform(2300, 2800)
+        for ratio, amp, tau in [(1, 1, .22), (1.51, .55, .16), (2.33, .35, .1), (3.2, .2, .07)]:
+            out += amp * np.sin(2 * np.pi * f0 * ratio * t + rng.uniform(0, 6)) * np.exp(-t / tau)
+        out *= np.minimum(1, t / 0.002)
+        tap = np.zeros(d, np.float32)  # a second, softer touch 28 ms later
+        lag = int(0.028 * SR)
+        tap[lag:] = out[:-lag] * 0.45
+        out = out + tap
+        return out / np.max(np.abs(out)) * 10 ** (-20 / 20) * gain
+
+    def whoosh(gain):
+        d = int(0.45 * SR)
+        noise = rng.standard_normal(d).astype(np.float32)
+        sp = np.fft.rfft(noise)
+        fr = np.fft.rfftfreq(d, 1 / SR)
+        sp *= np.exp(-((np.log(np.maximum(fr, 1)) - np.log(1800)) ** 2) / 1.2)
+        out = np.fft.irfft(sp, d).astype(np.float32)
+        env = np.sin(np.pi * np.linspace(0, 1, d)) ** 2
+        env = env * np.linspace(0.6, 1.0, d)
+        out *= env
+        return out / np.max(np.abs(out)) * 10 ** (-23 / 20) * gain
+
+    for i, fx in enumerate(edl.get("sfx", [])):
+        at = starts[fx["at"]] + fx.get("offset", 0)
+        sig = clink(fx.get("gain", 1)) if fx["type"] == "clink" else whoosh(fx.get("gain", 1))
+        a = max(0, int(at * SR))
+        b = min(n, a + len(sig))
+        pan = 0.5 + 0.12 * math.sin(i * 1.7)
+        mix[a:b, 0] += sig[: b - a] * (1 - pan) * 1.4
+        mix[a:b, 1] += sig[: b - a] * pan * 1.4
+
+    fade = int(0.08 * SR)
+    mix[:fade] *= np.linspace(0, 1, fade)[:, None]
+    end = int(total * SR)
+    mix[end - fade:end] *= np.linspace(1, 0, fade)[:, None]
+    mix = mix[:end]
+    pcm = (np.clip(mix, -1, 1) * 32767).astype(np.int16)
+    with wave.open(path, "wb") as w:
+        w.setnchannels(2)
+        w.setsampwidth(2)
+        w.setframerate(SR)
+        w.writeframes(pcm.tobytes())
+
+
+# --------------------------------------------------------------------------- main
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--edl", default="edit/edl.json")
+    ap.add_argument("--out", default="out/final_1080x1920.mp4")
+    ap.add_argument("--skip-type", action="store_true", help="reuse build/type frames")
+    ap.add_argument("--no-type", action="store_true", help="render without typography")
+    args = ap.parse_args()
+
+    edl = json.load(open(rel(args.edl)))
+    os.makedirs(BUILD, exist_ok=True)
+    os.makedirs(os.path.dirname(rel(args.out)), exist_ok=True)
+    tl = build_timeline(edl)
+    json.dump(tl, open(os.path.join(BUILD, "timeline.json"), "w"), indent=2)
+    print(f"timeline: {tl['total_frames']} frames = {tl['duration']:.2f}s", file=sys.stderr)
+
+    if not args.no_type and not args.skip_type:
+        subprocess.run(["node", rel("scripts/render_type.js")], check=True, cwd=ROOT)
+
+    wav = os.path.join(BUILD, "audio.wav")
+    synth_audio(edl, tl, wav)
+
+    grade = open(rel("edit/grade.txt")).read().strip()
+    w, h = edl["size"]
+    fps = edl["fps"]
+    cmd = ["ffmpeg", "-v", "error", "-y",
+           "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{w}x{h}", "-r", str(fps), "-i", "-"]
+    if args.no_type:
+        fc = f"[0:v]format=gbrp,{grade}[c];"
+        amap = "1:a"
+    else:
+        cmd += ["-framerate", str(fps), "-i", os.path.join(BUILD, "type", "%05d.png")]
+        fc = f"[0:v]format=gbrp,{grade}[g];[1:v]format=rgba[t];[g][t]overlay=0:0:format=gbrp:shortest=1[c];"
+        amap = "2:a"
+    fc += ("[c]scale=out_color_matrix=bt709:out_range=tv,format=yuv444p,"
+           "noise=c0s=3:c0f=t,format=yuv420p[v]")
+    cmd += ["-i", wav, "-filter_complex", fc, "-map", "[v]", "-map", amap,
+            "-c:v", "libx264", "-preset", "slow", "-crf", "16", "-profile:v", "high",
+            "-pix_fmt", "yuv420p", "-colorspace", "bt709", "-color_primaries", "bt709",
+            "-color_trc", "bt709", "-color_range", "tv",
+            "-c:a", "aac", "-b:a", "192k", "-ar", "48000",
+            "-movflags", "+faststart", "-shortest", rel(args.out)]
+    enc = subprocess.Popen(cmd, stdin=subprocess.PIPE)
+    count = 0
+    for fr in video_frames(edl, tl):
+        enc.stdin.write(np.ascontiguousarray(fr).tobytes())
+        count += 1
+    enc.stdin.close()
+    enc.wait()
+    print(f"wrote {count} frames -> {args.out}", file=sys.stderr)
+    if count != tl["total_frames"]:
+        print(f"WARNING: expected {tl['total_frames']} frames", file=sys.stderr)
+
+
+if __name__ == "__main__":
+    main()

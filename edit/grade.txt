@@ -1,0 +1,1 @@
+colortemperature=temperature=6900:mix=0.65:pl=0.3,colorbalance=bh=0.02:rs=0.01,curves=m='0/0.02 0.2/0.18 0.5/0.5 0.8/0.815 1/0.96',vibrance=intensity=0.18
