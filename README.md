@@ -8,6 +8,7 @@ Minimal, editorial TikTok affiliate edits (1080×1920, 30 fps): a soft shared gr
 | Power strip | `out/power_strip/final_1080x1920.mp4` | 15.3s | none (no on-screen text) |
 | USB hub | `out/usb_hub/final_1080x1920.mp4` | 7.4s | none (no on-screen text) |
 | Glasses + pouch | `out/glasses/final_1080x1920.mp4` | 6.2s | none (no on-screen text) |
+| Olive babydoll top | `out/olive_top/final_1080x1920.mp4` | 7.3s | none (no on-screen text) |
 
 Each `out/<project>/` folder also has `contact_sheet.jpg` and `previews/`. Put "linked below" in the post caption, next to the shop tag.
 
@@ -47,6 +48,17 @@ Each `out/<project>/` folder also has `contact_sheet.jpg` and `previews/`. Put "
 | 2.2–3.9 | Glasses on the tray with the pouch behind | slow push + drift | focus-pull dissolve |
 | 3.7–6.2 | Wide desk shot: glasses resting on the pouch | ease-out push, soft fade into the loop | zoom-through |
 
+## Olive babydoll top: beat by beat
+| Time | Shot | Motion | Transition in |
+|---|---|---|---|
+| 0.0–1.2 | Torso close-up in the mirror, hair flick | slight slow-mo, fast pull-back | — |
+| 1.2–2.6 | Full look, arms up in the hair | ease-out pull-back | zoom-through |
+| 2.6–3.8 | Tie front and babydoll flare, arm across the waist | slow push | zoom-through |
+| 3.8–5.1 | Full look, hair tousle | ease-out pull-back | zoom-through |
+| 4.9–7.3 | Full look, final pose | ease-out push, soft fade into the loop | soft-focus dissolve |
+
+Cut from the two raw mirror clips (`raw/proxy/olive_v_221457.mp4` full length, `raw/proxy/olive_h_221501.mp4` horizontal torso shot cropped to 9:16). The previously finished 1080p version wasn't used: its close-ups are crops of the same horizontal clip, and they carry their own heavy grade and burned-in text.
+
 The camera was bumped slightly partway through the power strip's plugging section. The renderer corrects this automatically (feature-matched alignment to a reference frame, `align_ref` in the edit file) so the stop-motion stays rock-steady.
 
 ## Look
@@ -61,6 +73,7 @@ python3 scripts/render.py bracelets        # -> out/bracelets/final_1080x1920.mp
 python3 scripts/render.py power_strip      # -> out/power_strip/final_1080x1920.mp4
 python3 scripts/render.py usb_hub          # -> out/usb_hub/final_1080x1920.mp4
 python3 scripts/render.py glasses          # -> out/glasses/final_1080x1920.mp4
+python3 scripts/render.py olive_top        # -> out/olive_top/final_1080x1920.mp4
 ```
 - `edit/<project>.json`: the timeline (source in/out, speed and ramps (`ramp_shape`: bell / in / out), zoom/center moves and easing, shared camera moves, alignment, transitions, SFX)
 - `type/<project>.html`: the title layout and animation, locked to the shot timing (an edit with `"typography": false` renders with no text; the overlay files are kept in case a title comes back)
