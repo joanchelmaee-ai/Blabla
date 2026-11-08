@@ -2,7 +2,6 @@
   "fps": 30,
   "size": [1080, 1920],
   "typography": false,
-  "grade": "edit/grade_natural.txt",
   "wb_lock": {"region": [0.60, 0.05, 0.78, 0.12], "ref_src": "on", "ref_t": 20.0, "luma_strength": 0.5},
   "music": {"bpm": 100, "kick_from_beat": 8,
             "chords": [["D3", "F#3", "A3", "C#4"], ["B2", "D3", "F#3", "A3"], ["G3", "B3", "D4", "F#4"], ["A3", "C#4", "E4", "F#4"]]},

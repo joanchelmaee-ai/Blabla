@@ -85,13 +85,13 @@ The three 3:54 PM takes (`raw/proxy/clip_35414/16/17.mp4`) repeat the same routi
 | 5.4–7.2 | 10–12 | Turns to the back and lands on an over-the-shoulder glance | eases into motion-interpolated slow motion for a smooth ending |
 
 - **Cuts and framing:** plain cuts only (no zooms, blurs or flashes), all on the beat of a 100 BPM track. Consistent full-length framing, with a single close-up.
-- **Grade** (`edit/grade_natural.txt`): neutral white wall, natural skin warmth, soft highlight roll-off, mild contrast. Plus `wb_lock` against the camera's colour drift, and AI upscaling.
+- **Colour:** true as-filmed colour (no filter), with `wb_lock` against the camera's colour drift, plus AI upscaling.
 - **Music** (`scripts/music.py`): an original groove synthesized from scratch (e-piano stabs, soft pad, sub bass, light drums), so there are no licensing issues. Chords are Fmaj7 → Em7 → Am7, written to loop seamlessly. Loudness is normalised to −14 LUFS for Instagram/TikTok.
 
 The camera's auto white balance and exposure drift during these takes (it flickers purple and yellow). Both edits use the renderer's `wb_lock`: every frame is corrected so a plain-wall patch (`region`) matches the same patch in a reference frame. Colour is locked fully and brightness at half strength, smoothed over time.
 
 ## Red off-the-shoulder top: item → try-on (Instagram Reels style)
-Cut from `raw/proxy/clip_35307.mp4` (presenting the top in a green cami) and `raw/proxy/clip_35304.mp4` (wearing it). Plain cuts only, all on the beat of a 100 BPM original track (Dmaj7 → Bm7 → Gmaj7 → A). The drums drop exactly on the outfit change. The edit uses the natural grade, colour lock and AI upscaling.
+Cut from `raw/proxy/clip_35307.mp4` (presenting the top in a green cami) and `raw/proxy/clip_35304.mp4` (wearing it). Plain cuts only, all on the beat of a 100 BPM original track (Dmaj7 → Bm7 → Gmaj7 → A). The drums drop exactly on the outfit change. True as-filmed colour (no filter), with colour lock and AI upscaling.
 
 | Time | Bars | Shot |
 |---|---|---|
@@ -106,7 +106,7 @@ Cut from `raw/proxy/clip_35307.mp4` (presenting the top in a green cami) and `ra
 The camera was bumped slightly partway through the power strip's plugging section. The renderer corrects this automatically (feature-matched alignment to a reference frame, `align_ref` in the edit file) so the stop-motion stays rock-steady.
 
 ## Look
-- **Grade** (`edit/grade.txt`, shared): removes the yellow cast from the wall and desk, keeps gold warm and whites clean, adds a soft highlight roll-off, a slight matte lift and gentle vibrance.
+- **Colour: no filter.** Footage keeps its true, as-filmed colours. There is no colour grade and no added grain; the only colour correction is `wb_lock`, which holds each shot to its own reference frame and cancels the phone's auto white-balance flicker. Optional looks remain available per edit (`"grade": "edit/grade.txt"` or `edit/grade_natural.txt`) but are off everywhere.
 - **Fonts** (`type/fonts`, all OFL licensed): Pinyon Script for the cursive line, and Montserrat as a stand-in for Gotham on the lowercase line. To use real Gotham, drop the file in and edit its `@font-face` rule in `type/<project>.html`.
 - **Audio:** a silent-ready bed (room tone, soft clinks or plug clicks as items appear, airy whooshes on transitions), kept low so a trending sound added in the TikTok app sits on top.
 
@@ -114,7 +114,7 @@ The camera was bumped slightly partway through the power strip's plugging sectio
   - Phone/WhatsApp footage is low resolution (e.g. 464×832), so every enlarged crop goes through an AI upscaler: Real-ESRGAN compact x4 (`realesr-general-x4v3`), which is trained on real-world degradations including compression.
   - It runs on CPU via onnxruntime. `scripts/build_sr_model.py` builds it from the official weights with a weights-only loader, and does so automatically on first render.
   - A light temporal denoise runs before upscaling so the result stays stable from frame to frame.
-  - Export: H.264 High at CRF 14 with `aq-mode=3` (less banding on white walls and desks), bt709, AAC 192k. That's roughly 15–20 Mbps, well above what TikTok re-encodes to.
+  - Export: H.264 High at CRF 14 with `aq-mode=3` (less banding on white walls and desks), bt709, AAC 192k, no added grain. That's roughly 15–20 Mbps, well above what TikTok/Instagram re-encode to.
   - `--draft` skips the upscaler for quick previews.
   - On the glasses reel this raised measured detail 2–3× and lowered frame-to-frame shimmer by about 20%.
 

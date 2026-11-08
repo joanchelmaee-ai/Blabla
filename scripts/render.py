@@ -569,20 +569,22 @@ def main():
     wav = os.path.join(BUILD, "audio.wav")
     synth_audio(edl, tl, wav)
 
-    grade = open(rel(edl.get("grade", "edit/grade.txt"))).read().strip()
+    # No colour filter by default: footage keeps its true, as-filmed colours. An edit can opt into a look
+    # with "grade": "edit/<file>.txt" (see edit/grade.txt, edit/grade_natural.txt).
+    grade = open(rel(edl["grade"])).read().strip() if edl.get("grade") else ""
+    gchain = f"format=gbrp,{grade}" if grade else "format=gbrp"
     w, h = edl["size"]
     fps = edl["fps"]
     cmd = ["ffmpeg", "-v", "error", "-y",
            "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{w}x{h}", "-r", str(fps), "-i", "-"]
     if args.no_type:
-        fc = f"[0:v]format=gbrp,{grade}[c];"
+        fc = f"[0:v]{gchain}[c];"
         amap = "1:a"
     else:
         cmd += ["-framerate", str(fps), "-i", os.path.join(BUILD, "type", "%05d.png")]
-        fc = f"[0:v]format=gbrp,{grade}[g];[1:v]format=rgba[t];[g][t]overlay=0:0:format=gbrp:shortest=1[c];"
+        fc = f"[0:v]{gchain}[g];[1:v]format=rgba[t];[g][t]overlay=0:0:format=gbrp:shortest=1[c];"
         amap = "2:a"
-    fc += ("[c]scale=out_color_matrix=bt709:out_range=tv,format=yuv444p,"
-           "noise=c0s=2:c0f=t,format=yuv420p[v]")
+    fc += "[c]scale=out_color_matrix=bt709:out_range=tv,format=yuv420p[v]"
     cmd += ["-i", wav, "-filter_complex", fc, "-map", "[v]", "-map", amap,
             "-c:v", "libx264", "-preset", "slow", "-crf", "14", "-profile:v", "high",
             "-x264-params", "aq-mode=3:aq-strength=0.9:deblock=-1,-1",
