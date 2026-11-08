@@ -9,6 +9,8 @@ Minimal, editorial TikTok affiliate edits (1080×1920, 30 fps): a soft shared gr
 | USB hub | `out/usb_hub/final_1080x1920.mp4` | 7.4s | none (no on-screen text) |
 | Glasses + pouch | `out/glasses/final_1080x1920.mp4` | 6.2s | none (no on-screen text) |
 | Olive babydoll top | `out/olive_top/final_1080x1920.mp4` | 7.3s | none (no on-screen text) |
+| Polka-dot peplum top, reel 1 "the reveal" | `out/polka_top_reveal/final_1080x1920.mp4` | 7.9s | none (no on-screen text) |
+| Polka-dot peplum top, reel 2 "angles" | `out/polka_top_angles/final_1080x1920.mp4` | 6.8s | none (no on-screen text) |
 
 Each `out/<project>/` folder also has `contact_sheet.jpg` and `previews/`. Put "linked below" in the post caption, next to the shop tag.
 
@@ -59,6 +61,29 @@ Each `out/<project>/` folder also has `contact_sheet.jpg` and `previews/`. Put "
 
 Cut from the two raw mirror clips (`raw/proxy/olive_v_221457.mp4` full length, `raw/proxy/olive_h_221501.mp4` horizontal torso shot cropped to 9:16). The previously finished 1080p version wasn't used: its close-ups are crops of the same horizontal clip, and they carry their own heavy grade and burned-in text.
 
+## Polka-dot peplum top: two reels from three takes
+The three 3:54 PM takes (`raw/proxy/clip_35414/16/17.mp4`) repeat the same routine, so the footage is split into two reels with different hooks and **no shared footage**.
+
+**Reel 1, "the reveal"**
+| Time | Shot | Motion | Transition in |
+|---|---|---|---|
+| 0.0–1.6 | Face close-up, steps back into the full outfit | slow→fast ramp | — |
+| 1.5–2.4 | Hands-on-hips pose (another take) | quick pull-back | 2-frame pop |
+| 2.4–3.4 | Hair-touch pose | slow push | 2-frame pop |
+| 3.4–5.0 | Turns to show the back, then starts back | slow→fast→slow ramp | zoom-through |
+| 5.0–5.7 | Turns back to the front | real speed | cut |
+| 5.7–7.9 | Final pose | ease-out push, soft fade into the loop | 3-frame pop |
+
+**Reel 2, "angles"**
+| Time | Shot | Motion | Transition in |
+|---|---|---|---|
+| 0.0–1.1 | Side-profile turn, waist-up | fast pull-back | — |
+| 1.0–3.7 | Pose montage alternating full-length and waist-up crops (polka dots, peplum) across takes | small punch zooms | 2-frame pops on the beat |
+| 3.7–4.8 | Turns to show the back | real speed | zoom-through |
+| 4.6–6.8 | Final pose | ease-out push, soft fade into the loop | soft-focus dissolve |
+
+The camera's auto white balance and exposure drift during these takes (it flickers purple and yellow). Both edits use the renderer's `wb_lock`: every frame is corrected so a plain-wall patch (`region`) matches the same patch in a reference frame. Colour is locked fully and brightness at half strength, smoothed over time.
+
 The camera was bumped slightly partway through the power strip's plugging section. The renderer corrects this automatically (feature-matched alignment to a reference frame, `align_ref` in the edit file) so the stop-motion stays rock-steady.
 
 ## Look
@@ -74,8 +99,10 @@ python3 scripts/render.py power_strip      # -> out/power_strip/final_1080x1920.
 python3 scripts/render.py usb_hub          # -> out/usb_hub/final_1080x1920.mp4
 python3 scripts/render.py glasses          # -> out/glasses/final_1080x1920.mp4
 python3 scripts/render.py olive_top        # -> out/olive_top/final_1080x1920.mp4
+python3 scripts/render.py polka_top_reveal # -> out/polka_top_reveal/final_1080x1920.mp4
+python3 scripts/render.py polka_top_angles # -> out/polka_top_angles/final_1080x1920.mp4
 ```
-- `edit/<project>.json`: the timeline (source in/out, speed and ramps (`ramp_shape`: bell / in / out), zoom/center moves and easing, shared camera moves, alignment, transitions, SFX)
+- `edit/<project>.json`: the timeline (source in/out, speed and ramps (`ramp_shape`: bell / in / out), zoom/center moves and easing, shared camera moves, alignment, `wb_lock` colour stabilisation, transitions, SFX)
 - `type/<project>.html`: the title layout and animation, locked to the shot timing (an edit with `"typography": false` renders with no text; the overlay files are kept in case a title comes back)
 - `scripts/render.py`: cuts, ramps, zooms, alignment and transitions, then grades, composites the type and encodes
 - `scripts/render_type.js`: renders the type layer to transparent PNG frames with Playwright

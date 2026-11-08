@@ -1,0 +1,23 @@
+{
+  "fps": 30,
+  "size": [1080, 1920],
+  "typography": false,
+  "wb_lock": {"region": [0.55, 0.02, 0.78, 0.12], "ref_src": "t16", "ref_t": 9.0, "luma_strength": 0.5},
+  "sources": {"t14": "raw/proxy/clip_35414.mp4", "t16": "raw/proxy/clip_35416.mp4", "t17": "raw/proxy/clip_35417.mp4"},
+  "shots": [
+    {"id": "hook",      "src": "t14", "in": 0.00,  "out": 2.20, "ramp_shape": "in", "ramp": 0.45, "dur": 1.60, "zoom": [1.0, 1.0], "center": [0.5, 0.5]},
+    {"id": "pose",      "src": "t16", "in": 6.20,  "speed": 1.0, "dur": 0.90, "zoom": [1.10, 1.04], "ease": "out", "center": [0.5, 0.5], "trans_in": {"type": "pop", "frames": 2}},
+    {"id": "hair",      "src": "t14", "in": 5.30,  "speed": 1.0, "dur": 1.00, "zoom": [1.0, 1.05], "center": [0.5, 0.5], "trans_in": {"type": "pop", "frames": 2}},
+    {"id": "back",      "src": "t14", "in": 12.30, "out": 15.40, "ramp": 0.6, "dur": 1.60, "zoom": [1.04, 1.04], "center": [0.5, 0.5],
+     "trans_in": {"type": "zoom", "frames": 4, "focus_out": [0.5, 0.45], "focus_in": [0.5, 0.5]}},
+    {"id": "front",     "src": "t14", "in": 15.40, "speed": 1.0, "dur": 0.80, "zoom": [1.04, 1.04], "center": [0.5, 0.5]},
+    {"id": "final",     "src": "t16", "in": 9.00,  "speed": 1.0, "dur": 2.20, "zoom": [1.0, 1.12], "ease": "out", "center": [0.5, 0.45],
+     "trans_in": {"type": "pop", "frames": 3}, "fade_out": 8}
+  ],
+  "sfx": [
+    {"type": "click",  "at": "pose",  "offset": 0.0, "gain": 0.5},
+    {"type": "click",  "at": "hair",  "offset": 0.0, "gain": 0.5},
+    {"type": "whoosh", "at": "back",  "offset": -0.12, "gain": 0.9},
+    {"type": "click",  "at": "final", "offset": 0.0, "gain": 0.5}
+  ]
+}

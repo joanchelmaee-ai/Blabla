@@ -240,6 +240,36 @@ def align_matrix(spec, cam, reader, edl, info):
     return A
 
 
+_WB_TARGET = {}
+
+
+def _region_mean(img, region):
+    h, w = img.shape[:2]
+    x0, y0, x1, y1 = region
+    return img[int(y0 * h):int(y1 * h), int(x0 * w):int(x1 * w)].reshape(-1, 3).astype(np.float32).mean(0) + 1e-3
+
+
+def wb_target(edl):
+    """Reference colour of a static, neutral patch (e.g. plain wall) taken from one chosen frame."""
+    cfg = edl["wb_lock"]
+    key = (cfg["ref_src"], cfg["ref_t"])
+    if key not in _WB_TARGET:
+        path = rel(edl["sources"][cfg["ref_src"]])
+        r = SourceReader(path, cfg["ref_t"], probe(path))
+        _WB_TARGET[key] = _region_mean(r.frame_at_index(r.index(cfg["ref_t"])), cfg["region"])
+        r.close()
+    return _WB_TARGET[key]
+
+
+def wb_gains(img, cfg, target):
+    """Per-channel gains that hold the reference patch at the target colour (cancels auto white-balance
+    and auto-exposure drift); brightness is corrected at `luma_strength` so real light changes survive."""
+    m = _region_mean(img, cfg["region"])
+    chroma = (target / target.mean()) / (m / m.mean())
+    luma = (target.mean() / m.mean()) ** cfg.get("luma_strength", 0.5)
+    return np.clip(chroma * luma, 0.7, 1.4).astype(np.float32)
+
+
 def shot_frames(spec, reader, edl, tl, info=None):
     """Yield the output frames of one shot."""
     fps, (out_w, out_h) = edl["fps"], edl["size"]
@@ -254,6 +284,9 @@ def shot_frames(spec, reader, edl, tl, info=None):
              "in": lambda u: u ** 3}.get(cam.get("ease"), lambda u: u)
     shutter = spec.get("shutter", 0.5)
     pre = align_matrix(spec, cam, reader, edl, info) if info else None
+    wb = edl.get("wb_lock") if spec.get("wb_lock", True) else None
+    target = wb_target(edl) if wb else None
+    gains = None
     for k in range(n):
         if "out" in spec:  # speed ramp covering [in, out] in `dur`
             a = spec.get("ramp", 0.7)
@@ -272,6 +305,10 @@ def shot_frames(spec, reader, edl, tl, info=None):
             ta = spec["in"] + k / fps * sp
             tb = ta + sp / fps
         src = reader.blended(ta, ta + shutter * (tb - ta))
+        if wb:
+            g = wb_gains(src, wb, target)
+            gains = g if gains is None else 0.75 * gains + 0.25 * g  # smooth so the lock never pumps
+            src = np.clip(src.astype(np.float32) * gains, 0, 255).astype(np.uint8)
         u = (me["start_frame"] + k - g0) / max(1, g1 - g0)
         e = zease(min(1.0, max(0.0, u)))
         c = (lerp(center[0], center_end[0], e), lerp(center[1], center_end[1], e))
