@@ -6,6 +6,7 @@ Minimal, editorial TikTok affiliate edits (1080×1920, 30 fps): a soft shared gr
 |---|---|---|---|
 | Non-tarnish bracelets | `out/bracelets/final_1080x1920.mp4` | 15.7s | none (no on-screen text) |
 | Power strip | `out/power_strip/final_1080x1920.mp4` | 15.3s | none (no on-screen text) |
+| USB hub | `out/usb_hub/final_1080x1920.mp4` | 15.0s | none (no on-screen text) |
 
 Each `out/<project>/` folder also has `contact_sheet.jpg` and `previews/`. Put "linked below" in the post caption, next to the shop tag.
 
@@ -27,7 +28,18 @@ Each `out/<project>/` folder also has `contact_sheet.jpg` and `previews/`. Put "
 | 7.1–11.9 | Locked-off stop-motion: plugs appear one by one with soft clicks; the black adapter goes in by hand with a speed ramp | zoom-through, then pop fades |
 | 11.9–15.3 | Fully plugged-in setup, eased push-in, soft fade into the loop | pop fade |
 
-The camera was bumped slightly partway through the plugging section. The renderer corrects this automatically (feature-matched alignment to a reference frame, `align_ref` in the edit file) so the stop-motion stays rock-steady.
+## USB hub: beat by beat
+| Time | Shot | Transition in |
+|---|---|---|
+| 0.0–2.8 | Hub lifted into frame, logo side, slow-mo pull-out | — |
+| 2.8–5.4 | Port side (USB ports, card slots), slow-mo push-in | zoom-through |
+| 5.2–7.0 | Ports held up higher, closer | soft-focus dissolve |
+| 6.9–7.9 | The hub turns back to its logo side (speed ramp) | pop fade |
+| 7.6–10.0 | Dual-head cable connector close-up, slow-mo | soft-focus dissolve |
+| 10.0–11.1 | Set down on the desk (speed ramp) | zoom-through |
+| 11.0–15.0 | Hub on the desk, eased push-in, soft fade into the loop | pop fade |
+
+The camera was bumped slightly partway through the power strip's plugging section. The renderer corrects this automatically (feature-matched alignment to a reference frame, `align_ref` in the edit file) so the stop-motion stays rock-steady.
 
 ## Look
 - **Grade** (`edit/grade.txt`, shared): removes the yellow cast from the wall and desk, keeps gold warm and whites clean, adds a soft highlight roll-off, a slight matte lift and gentle vibrance.
@@ -39,6 +51,7 @@ The camera was bumped slightly partway through the plugging section. The rendere
 pip install numpy opencv-python-headless   # plus ffmpeg, node + playwright (chromium)
 python3 scripts/render.py bracelets        # -> out/bracelets/final_1080x1920.mp4
 python3 scripts/render.py power_strip      # -> out/power_strip/final_1080x1920.mp4
+python3 scripts/render.py usb_hub          # -> out/usb_hub/final_1080x1920.mp4
 ```
 - `edit/<project>.json`: the timeline (source in/out, speed and ramps, zoom/center moves, shared camera moves, alignment, transitions, SFX)
 - `type/<project>.html`: the title layout and animation, locked to the shot timing (an edit with `"typography": false` renders with no text; the overlay files are kept in case a title comes back)
