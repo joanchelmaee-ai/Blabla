@@ -1,6 +1,7 @@
 {
   "fps": 30,
   "size": [1080, 1920],
+  "typography": false,
   "sources": {
     "stack_build": "raw/proxy/clip_11330.mp4",
     "close_a": "raw/proxy/clip_11318.mp4",

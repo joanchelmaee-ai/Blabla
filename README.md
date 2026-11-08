@@ -4,15 +4,15 @@ Minimal, editorial TikTok affiliate edits (1080×1920, 30 fps): a soft shared gr
 
 | Project | Deliverable | Length | Title |
 |---|---|---|---|
-| Non-tarnish bracelets | `out/bracelets/final_1080x1920.mp4` | 15.7s | *obsessing over* / these non tarnish bracelets |
+| Non-tarnish bracelets | `out/bracelets/final_1080x1920.mp4` | 15.7s | none (no on-screen text) |
 | Power strip | `out/power_strip/final_1080x1920.mp4` | 15.3s | none (no on-screen text) |
 
-Each `out/<project>/` folder also has `contact_sheet.jpg` and `previews/`; the bracelets folder also has `safezone_check.jpg` (TikTok UI zones overlaid on the title frame). Put "linked below" in the post caption, next to the shop tag.
+Each `out/<project>/` folder also has `contact_sheet.jpg` and `previews/`. Put "linked below" in the post caption, next to the shop tag.
 
 ## Bracelets: beat by beat
 | Time | Shot | Transition in |
 |---|---|---|
-| 0.0–2.8 | Close-up of the finished stack, slow-mo pull-out, with the title | — |
+| 0.0–2.8 | Close-up of the finished stack, slow-mo pull-out | — |
 | 2.8–6.7 | Locked-off stop-motion: the bracelets appear one by one under one slow push; the last is placed by hand with a speed ramp | zoom-through, then 3-frame pop fades |
 | 6.7–9.2 | The full stack, eased push-in | continuous |
 | 9.2–12.9 | Slow-mo detail close-ups | zoom-through, then soft-focus dissolve |
@@ -41,7 +41,7 @@ python3 scripts/render.py bracelets        # -> out/bracelets/final_1080x1920.mp
 python3 scripts/render.py power_strip      # -> out/power_strip/final_1080x1920.mp4
 ```
 - `edit/<project>.json`: the timeline (source in/out, speed and ramps, zoom/center moves, shared camera moves, alignment, transitions, SFX)
-- `type/<project>.html`: the title layout and animation, locked to the shot timing (an edit with `"typography": false` renders with no text; `type/power_strip.html` is kept in case the title comes back)
+- `type/<project>.html`: the title layout and animation, locked to the shot timing (an edit with `"typography": false` renders with no text; the overlay files are kept in case a title comes back)
 - `scripts/render.py`: cuts, ramps, zooms, alignment and transitions, then grades, composites the type and encodes
 - `scripts/render_type.js`: renders the type layer to transparent PNG frames with Playwright
 
