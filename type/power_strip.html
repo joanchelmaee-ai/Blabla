@@ -1,0 +1,131 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Power Strip Type</title>
+<style>
+  /* Free stand-ins: Montserrat = Gotham, Pinyon Script = cursive.
+     Drop real Gotham files in type/fonts and point the @font-face rule at them. */
+  @font-face { font-family: "Gotham"; src: url(fonts/montserrat-latin-500-normal.woff2); font-weight: 500; }
+  @font-face { font-family: "Script"; src: url(fonts/pinyon-script-latin-400-normal.woff2); }
+
+  :root { --ink: #1f1a16; --bronze: #7d5e38; }
+  html, body { margin: 0; width: 1080px; height: 1920px; background: transparent; overflow: hidden; }
+  body { position: relative; -webkit-font-smoothing: antialiased; }
+
+  .abs { position: absolute; white-space: nowrap; will-change: transform, opacity; opacity: 0; }
+  .script { font-family: "Script"; color: var(--bronze); line-height: 1.25; padding: 0 40px 10px 18px; margin-left: -18px; }
+  .label { font-family: "Gotham"; font-weight: 500; color: var(--ink); letter-spacing: .42em; text-transform: uppercase; }
+  .caption { font-family: "Gotham"; font-weight: 500; color: var(--ink); letter-spacing: .01em; }
+  .word { display: inline-block; will-change: transform, opacity; }
+  .line { display: inline-block; overflow: hidden; vertical-align: top; padding-top: .06em; }
+  .ch { display: inline-block; will-change: transform; }
+</style>
+</head>
+<body>
+<!-- One title, written the way a creator would say it: lowercase, no taglines, no rules.
+     A soft warm-white haze sits behind it so it stays legible over the flowers. -->
+<div id="h_veil" class="abs" style="left:0; top:0; width:1080px; height:640px;
+     background: linear-gradient(180deg, rgba(248,245,240,.72) 0%, rgba(248,245,240,.55) 45%, rgba(248,245,240,0) 100%);"></div>
+<div id="h_line1" class="abs script" style="left:96px; top:142px; font-size:124px;">the desk upgrade</div>
+<div id="h_line2" class="abs caption" style="left:100px; top:322px; font-size:48px;">i didn&#8217;t know i needed</div>
+
+<script>
+const TL = window.__TL || {fps: 30, duration: 16, shots: []};
+const shot = id => TL.shots.find(s => s.id === id) || {start: 0, dur: 0};
+const st = id => shot(id).start;
+const en = id => shot(id).start + shot(id).dur;
+
+const clamp = x => Math.max(0, Math.min(1, x));
+const expo = x => x >= 1 ? 1 : 1 - Math.pow(2, -10 * x);
+const cubic = x => 1 - Math.pow(1 - x, 3);
+const inout = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const $ = id => document.getElementById(id);
+
+function prepare() {
+  document.querySelectorAll('[data-fit]').forEach(el => {
+    const max = +el.dataset.fit;
+    let fs = parseFloat(el.style.fontSize);
+    el.style.opacity = 1;
+    while (el.getBoundingClientRect().width > max && fs > 20) { fs -= 2; el.style.fontSize = fs + 'px'; }
+    el.style.opacity = 0;
+  });
+  document.querySelectorAll('.caption').forEach(el => {
+    el.innerHTML = el.textContent.split(' ').map(w => `<span class="word">${w}</span>`).join(' ');
+  });
+  document.querySelectorAll('.display').forEach(el => {
+    el.innerHTML = '<span class="line">' + [...el.textContent].map(c => `<span class="ch">${c}</span>`).join('') + '</span>';
+  });
+}
+
+// wipe: handwriting-style reveal · words: word-by-word soft rise
+// every cue exits with a soft lift, fade and defocus
+const CUES = [];
+const cue = (id, type, tin, tout, o = {}) => CUES.push({id, type, tin, tout, dur: o.dur || .5, stag: o.stag || .05, exit: o.exit || .2});
+
+function build() {
+  const h1 = en('hook') - .02;
+  cue('h_veil', 'fade', 0, h1, {dur: .4, exit: .2});
+  cue('h_line1', 'wipe', .05, h1, {dur: .7, exit: .16});
+  cue('h_line2', 'words', .4, h1, {dur: .45, stag: .07, exit: .16});
+}
+
+function render(t) {
+  for (const c of CUES) {
+    const el = $(c.id);
+    if (t < c.tin || t > c.tout) { el.style.opacity = 0; continue; }
+    const p = clamp((t - c.tin) / c.dur);
+    const x = clamp((t - (c.tout - c.exit)) / c.exit);
+    const xo = 1 - cubic(x), xy = -14 * cubic(x), xb = 5 * x;
+    const rot = el.dataset.rot ? ` rotate(${el.dataset.rot}deg)` : '';
+    if (c.type === 'fade') {
+      el.style.opacity = cubic(p) * xo;
+    } else if (c.type === 'rise') {
+      const e = cubic(p);
+      el.style.opacity = e * xo;
+      el.style.transform = `translateY(${(1 - e) * 16 + xy}px)`;
+      el.style.filter = `blur(${(1 - e) * 6 + xb}px)`;
+      el.style.letterSpacing = `${.62 - .2 * e}em`;  // tracking settles in as it arrives
+    } else if (c.type === 'wipe') {
+      const pos = -18 + 128 * inout(p);
+      const m = `linear-gradient(90deg, #000 0%, #000 ${pos}%, transparent ${pos + 18}%)`;
+      el.style.webkitMaskImage = m; el.style.maskImage = m;
+      el.style.opacity = xo;
+      el.style.transform = `translate(${(1 - cubic(p)) * -10}px, ${xy}px)` + rot;
+      el.style.filter = `blur(${xb}px)`;
+    } else if (c.type === 'letters') {
+      el.style.opacity = xo;
+      el.style.transform = `translateY(${xy}px)`;
+      el.style.filter = `blur(${xb}px)`;
+      el.querySelectorAll('.ch').forEach((ch, i) => {
+        const q = expo(clamp((t - c.tin - i * c.stag) / c.dur));
+        ch.style.transform = `translateY(${(1 - q) * 105}%)`;
+      });
+    } else if (c.type === 'words') {
+      el.style.opacity = xo;
+      el.style.transform = `translateY(${xy}px)`;
+      el.style.filter = `blur(${xb}px)`;
+      el.querySelectorAll('.word').forEach((w, i) => {
+        const q = cubic(clamp((t - c.tin - i * c.stag) / c.dur));
+        w.style.opacity = q;
+        w.style.transform = `translateY(${(1 - q) * 14}px)`;
+      });
+    } else if (c.type === 'rule') {
+      el.style.opacity = xo;
+      el.style.transform = `scaleX(${inout(p)})`;
+    }
+  }
+}
+
+window.ready = (async () => {
+  await document.fonts.ready;
+  await Promise.all([...document.fonts].map(f => f.load()));
+  prepare();
+  build();
+  render(0);
+  return true;
+})();
+window.render = render;
+</script>
+</body>
+</html>

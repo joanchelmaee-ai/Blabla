@@ -1,12 +1,14 @@
 #!/usr/bin/env node
-// Renders type/overlay.html frame-by-frame into transparent PNGs (build/type/%05d.png),
-// driven by build/timeline.json so every text cue is locked to the cut.
+// Renders a type/<project>.html overlay frame-by-frame into transparent PNGs (<build>/type/%05d.png),
+// driven by <build>/timeline.json so every text cue is locked to the cut.
+// usage: node scripts/render_type.js <overlay.html> <build dir> [frame,list]
 const fs = require('fs');
 const path = require('path');
 const { chromium } = require('playwright');
 
 const ROOT = path.resolve(__dirname, '..');
-const BUILD = path.join(ROOT, 'build');
+const HTML = process.argv[2] || path.join(ROOT, 'type', 'bracelets.html');
+const BUILD = process.argv[3] || path.join(ROOT, 'build', 'bracelets');
 const OUT = path.join(BUILD, 'type');
 
 (async () => {
@@ -17,10 +19,10 @@ const OUT = path.join(BUILD, 'type');
   const browser = await chromium.launch();
   const page = await browser.newPage({ viewport: { width: 1080, height: 1920 }, deviceScaleFactor: 1 });
   await page.addInitScript(`window.__TL = ${JSON.stringify(tl)};`);
-  await page.goto('file://' + path.join(ROOT, 'type', 'overlay.html'));
+  await page.goto('file://' + path.resolve(HTML));
   await page.evaluate(() => window.ready);
 
-  const only = process.argv[2] ? process.argv[2].split(',').map(Number) : null; // optional: frame list
+  const only = process.argv[4] ? process.argv[4].split(',').map(Number) : null; // optional: frame list
   const frames = only || [...Array(tl.total_frames).keys()];
   for (const f of frames) {
     await page.evaluate((t) => window.render(t), f / tl.fps);

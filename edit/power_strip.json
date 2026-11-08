@@ -1,0 +1,37 @@
+{
+  "fps": 30,
+  "size": [1080, 1920],
+  "sources": {
+    "strip": "raw/proxy/clip_11313.mp4"
+  },
+  "cameras": [
+    {"name": "plug_in", "shots": ["s0", "s1", "s2", "act", "s3", "s4"], "zoom": [1.12, 1.18], "center": [0.55, 0.68],
+     "align_ref": 104.0}
+  ],
+  "shots": [
+    {"id": "hook",    "src": "strip", "in": 11.00, "speed": 0.6, "dur": 3.00, "zoom": [1.10, 1.02], "center": [0.5, 0.5]},
+    {"id": "sockets", "src": "strip", "in": 16.90, "speed": 0.6, "dur": 2.20, "zoom": [1.45, 1.56], "center": [0.5, 0.56],
+     "trans_in": {"type": "zoom", "frames": 6, "focus_out": [0.45, 0.6], "focus_in": [0.5, 0.56]}},
+    {"id": "desk",    "src": "strip", "in": 1.00,  "speed": 0.8, "dur": 2.20, "zoom": [1.02, 1.08], "center": [0.45, 0.65],
+     "trans_in": {"type": "blur", "frames": 9}},
+    {"id": "s0",      "src": "strip", "in": 72.0,  "speed": 1.0, "dur": 1.00,
+     "trans_in": {"type": "zoom", "frames": 6, "focus_out": [0.42, 0.78], "focus_in": [0.6, 0.72]}},
+    {"id": "s1",      "src": "strip", "in": 93.0,  "speed": 1.0, "dur": 0.80, "trans_in": {"type": "pop", "frames": 3}},
+    {"id": "s2",      "src": "strip", "in": 103.5, "speed": 1.0, "dur": 0.80, "trans_in": {"type": "pop", "frames": 3}},
+    {"id": "act",     "src": "strip", "in": 108.3, "out": 113.9, "ramp": 0.7, "dur": 1.20, "trans_in": {"type": "pop", "frames": 3}},
+    {"id": "s3",      "src": "strip", "in": 116.0, "speed": 1.0, "dur": 0.80, "trans_in": {"type": "pop", "frames": 3}},
+    {"id": "s4",      "src": "strip", "in": 135.0, "speed": 1.0, "dur": 0.80, "trans_in": {"type": "pop", "frames": 3}},
+    {"id": "reveal",  "src": "strip", "in": 158.3, "speed": 1.0, "dur": 3.40, "zoom": [1.18, 1.36], "center": [0.55, 0.68], "center_end": [0.6, 0.76],
+     "ease": "inout", "align_ref": 104.0, "trans_in": {"type": "pop", "frames": 3}, "fade_out": 10}
+  ],
+  "sfx": [
+    {"type": "whoosh", "at": "sockets", "offset": -0.15, "gain": 0.7},
+    {"type": "whoosh", "at": "desk",    "offset": -0.15, "gain": 0.4},
+    {"type": "whoosh", "at": "s0",      "offset": -0.15, "gain": 0.8},
+    {"type": "click",  "at": "s1",      "offset": 0.0},
+    {"type": "click",  "at": "s2",      "offset": 0.0},
+    {"type": "click",  "at": "s3",      "offset": -0.25},
+    {"type": "click",  "at": "s4",      "offset": 0.0},
+    {"type": "click",  "at": "reveal",  "offset": 0.0, "gain": 1.1}
+  ]
+}

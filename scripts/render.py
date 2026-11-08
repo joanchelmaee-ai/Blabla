@@ -9,7 +9,8 @@ Pipeline
                   piped into ffmpeg which applies the shared grade (edit/grade.txt),
                   composites the typography, adds grain and encodes 1080x1920 H.264.
 
-Usage:  python3 scripts/render.py [--skip-type] [--out out/final_1080x1920.mp4]
+Usage:  python3 scripts/render.py <project> [--skip-type] [--no-type]
+        e.g. python3 scripts/render.py bracelets   -> out/bracelets/final_1080x1920.mp4
 """
 import argparse
 import json
@@ -24,7 +25,6 @@ import cv2
 import numpy as np
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-BUILD = os.path.join(ROOT, "build")
 
 
 def rel(p):
@@ -130,7 +130,7 @@ def lerp(a, b, u):
     return a + (b - a) * u
 
 
-def warp_view(img, zoom, center, out_w, out_h, upscale):
+def warp_view(img, zoom, center, out_w, out_h, upscale, pre=None):
     """Sub-pixel crop (9:16) + resize in one affine warp, so slow zooms never jitter."""
     h, w = img.shape[:2]
     target = out_w / out_h
@@ -144,6 +144,8 @@ def warp_view(img, zoom, center, out_w, out_h, upscale):
     x0, y0 = cx - cw / 2, cy - ch / 2
     s = out_w / cw
     m = np.array([[s, 0, -x0 * s], [0, s, -y0 * s]], np.float32)
+    if pre is not None:  # fold the alignment into the same single resample
+        m = (np.vstack([m, [0, 0, 1]]) @ np.vstack([pre, [0, 0, 1]]))[:2].astype(np.float32)
     interp = cv2.INTER_LANCZOS4 if s > 1 else cv2.INTER_AREA
     out = cv2.warpAffine(img, m, (out_w, out_h), flags=interp, borderMode=cv2.BORDER_REFLECT)
     if s > 1.15:  # recover some crispness lost to upscaling (proxies); gentle on originals
@@ -208,7 +210,37 @@ def camera_for(spec, edl, tl):
     return spec, me["start_frame"], me["start_frame"] + me["frames"] - 1
 
 
-def shot_frames(spec, reader, edl, tl):
+_ALIGN_CACHE = {}
+
+
+def align_matrix(spec, cam, reader, edl, info):
+    """Similarity transform mapping this shot's frames onto the camera group's reference frame,
+    estimated from ORB features in the static upper part of the frame (props, wall)."""
+    ref_t = cam.get("align_ref")
+    if ref_t is None:
+        return None
+    key = (spec["src"], spec["in"], ref_t)
+    if key in _ALIGN_CACHE:
+        return _ALIGN_CACHE[key]
+    ref_reader = SourceReader(rel(edl["sources"][spec["src"]]), ref_t, info)
+    ref = cv2.cvtColor(ref_reader.frame_at_index(ref_reader.index(ref_t)), cv2.COLOR_RGB2GRAY)
+    ref_reader.close()
+    cur = cv2.cvtColor(reader.frame_at_index(reader.index(spec["in"])), cv2.COLOR_RGB2GRAY)
+    h = ref.shape[0]
+    mask = np.zeros_like(ref)
+    mask[: int(h * cam.get("align_mask_top", 0.45)), :] = 255
+    orb = cv2.ORB_create(3000)
+    kr, dr = orb.detectAndCompute(ref, mask)
+    kc, dc = orb.detectAndCompute(cur, mask)
+    m = sorted(cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True).match(dc, dr), key=lambda x: x.distance)[:400]
+    A, _ = cv2.estimateAffinePartial2D(np.float32([kc[x.queryIdx].pt for x in m]),
+                                       np.float32([kr[x.trainIdx].pt for x in m]),
+                                       method=cv2.RANSAC, ransacReprojThreshold=2.0)
+    _ALIGN_CACHE[key] = A
+    return A
+
+
+def shot_frames(spec, reader, edl, tl, info=None):
     """Yield the output frames of one shot."""
     fps, (out_w, out_h) = edl["fps"], edl["size"]
     n = int(round(spec["dur"] * fps))
@@ -219,6 +251,7 @@ def shot_frames(spec, reader, edl, tl):
     center_end = cam.get("center_end", center)
     zease = ease_inout if cam.get("ease") == "inout" else (lambda u: u)
     shutter = spec.get("shutter", 0.5)
+    pre = align_matrix(spec, cam, reader, edl, info) if info else None
     for k in range(n):
         if "out" in spec:  # speed ramp: slow -> fast -> slow, covering [in, out] in `dur`
             a = spec.get("ramp", 0.7)
@@ -234,7 +267,7 @@ def shot_frames(spec, reader, edl, tl):
         u = (me["start_frame"] + k - g0) / max(1, g1 - g0)
         e = zease(min(1.0, max(0.0, u)))
         c = (lerp(center[0], center_end[0], e), lerp(center[1], center_end[1], e))
-        yield warp_view(src, lerp(z0, z1, e), c, out_w, out_h, True)
+        yield warp_view(src, lerp(z0, z1, e), c, out_w, out_h, True, pre)
 
 
 def video_frames(edl, tl):
@@ -244,7 +277,7 @@ def video_frames(edl, tl):
     shots = edl["shots"]
     for si, spec in enumerate(shots):
         reader = SourceReader(rel(edl["sources"][spec["src"]]), spec["in"], infos[spec["src"]])
-        frames = shot_frames(spec, reader, edl, tl)
+        frames = shot_frames(spec, reader, edl, tl, infos[spec["src"]])
         tin = spec.get("trans_in", {})
         nxt = shots[si + 1] if si + 1 < len(shots) else None
         ntr = (nxt or {}).get("trans_in", {})
@@ -320,6 +353,19 @@ def synth_audio(edl, tl, path):
         out = out + tap
         return out / np.max(np.abs(out)) * 10 ** (-20 / 20) * gain
 
+    def click(gain):
+        """Soft plastic 'plug-in' click: a short band-passed transient over a tiny low thump."""
+        d = int(0.12 * SR)
+        t = np.arange(d) / SR
+        noise = rng.standard_normal(d).astype(np.float32)
+        sp = np.fft.rfft(noise)
+        fr = np.fft.rfftfreq(d, 1 / SR)
+        sp *= np.exp(-((np.log(np.maximum(fr, 1)) - np.log(3200)) ** 2) / 0.35)
+        snap = np.fft.irfft(sp, d).astype(np.float32) * np.exp(-t / 0.006)
+        thump = np.sin(2 * np.pi * 180 * t) * np.exp(-t / 0.018) * 0.5
+        out = snap / (np.max(np.abs(snap)) + 1e-9) + thump
+        return out / np.max(np.abs(out)) * 10 ** (-13 / 20) * gain
+
     def whoosh(gain):
         d = int(0.45 * SR)
         noise = rng.standard_normal(d).astype(np.float32)
@@ -334,7 +380,7 @@ def synth_audio(edl, tl, path):
 
     for i, fx in enumerate(edl.get("sfx", [])):
         at = starts[fx["at"]] + fx.get("offset", 0)
-        sig = clink(fx.get("gain", 1)) if fx["type"] == "clink" else whoosh(fx.get("gain", 1))
+        sig = {"clink": clink, "whoosh": whoosh, "click": click}[fx["type"]](fx.get("gain", 1))
         a = max(0, int(at * SR))
         b = min(n, a + len(sig))
         pan = 0.5 + 0.12 * math.sin(i * 1.7)
@@ -357,13 +403,15 @@ def synth_audio(edl, tl, path):
 # --------------------------------------------------------------------------- main
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--edl", default="edit/edl.json")
-    ap.add_argument("--out", default="out/final_1080x1920.mp4")
-    ap.add_argument("--skip-type", action="store_true", help="reuse build/type frames")
+    ap.add_argument("project", help="name of the edit: reads edit/<project>.json + type/<project>.html")
+    ap.add_argument("--out", help="default: out/<project>/final_1080x1920.mp4")
+    ap.add_argument("--skip-type", action="store_true", help="reuse the rendered type frames")
     ap.add_argument("--no-type", action="store_true", help="render without typography")
     args = ap.parse_args()
+    args.out = args.out or f"out/{args.project}/final_1080x1920.mp4"
+    BUILD = os.path.join(ROOT, "build", args.project)
 
-    edl = json.load(open(rel(args.edl)))
+    edl = json.load(open(rel(f"edit/{args.project}.json")))
     os.makedirs(BUILD, exist_ok=True)
     os.makedirs(os.path.dirname(rel(args.out)), exist_ok=True)
     tl = build_timeline(edl)
@@ -371,7 +419,8 @@ def main():
     print(f"timeline: {tl['total_frames']} frames = {tl['duration']:.2f}s", file=sys.stderr)
 
     if not args.no_type and not args.skip_type:
-        subprocess.run(["node", rel("scripts/render_type.js")], check=True, cwd=ROOT)
+        subprocess.run(["node", rel("scripts/render_type.js"), rel(f"type/{args.project}.html"), BUILD],
+                       check=True, cwd=ROOT)
 
     wav = os.path.join(BUILD, "audio.wav")
     synth_audio(edl, tl, wav)
