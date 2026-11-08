@@ -4,10 +4,9 @@
 <meta charset="utf-8">
 <title>Stack Edit Type</title>
 <style>
-  /* Free stand-ins: Montserrat = Gotham, Syne = Advercase, Pinyon Script = cursive.
-     Drop real Gotham / Advercase files in type/fonts and point these @font-face rules at them. */
+  /* Free stand-ins: Montserrat = Gotham, Pinyon Script = cursive.
+     Drop real Gotham files in type/fonts and point the @font-face rule at them. */
   @font-face { font-family: "Gotham"; src: url(fonts/montserrat-latin-500-normal.woff2); font-weight: 500; }
-  @font-face { font-family: "Advercase"; src: url(fonts/syne-latin-800-normal.woff2); font-weight: 800; }
   @font-face { font-family: "Script"; src: url(fonts/pinyon-script-latin-400-normal.woff2); }
 
   :root { --ink: #1f1a16; --bronze: #7d5e38; }
@@ -16,25 +15,17 @@
 
   .abs { position: absolute; white-space: nowrap; will-change: transform, opacity; opacity: 0; }
   .script { font-family: "Script"; color: var(--bronze); line-height: 1.25; padding: 0 40px 10px 18px; margin-left: -18px; }
-  .display { font-family: "Advercase"; font-weight: 800; color: var(--ink); line-height: .86; letter-spacing: -.035em; }
   .label { font-family: "Gotham"; font-weight: 500; color: var(--ink); letter-spacing: .42em; text-transform: uppercase; }
-  .rule { height: 2px; background: var(--ink); transform-origin: left center; }
+  .caption { font-family: "Gotham"; font-weight: 500; color: var(--ink); letter-spacing: .01em; }
+  .word { display: inline-block; will-change: transform, opacity; }
   .line { display: inline-block; overflow: hidden; vertical-align: top; padding-top: .06em; }
   .ch { display: inline-block; will-change: transform; }
 </style>
 </head>
 <body>
-<!-- Three moments only, all hung from the same 96px left margin:
-     hook (build my STACK) -> the one selling point (non-tarnish) -> sign-off (effortless, ALWAYS.) -->
-
-<div id="h_build" class="abs script"  style="left:96px; top:150px; font-size:112px;" data-rot="-4">build my</div>
-<div id="h_stack" class="abs display" style="left:88px; top:282px; font-size:236px;" data-fit="800">STACK</div>
-
-<div id="d_rule"   class="abs rule"   style="left:100px; top:349px; width:56px;"></div>
-<div id="d_label"  class="abs label"  style="left:178px; top:330px; font-size:34px;">non-tarnish</div>
-
-<div id="e_script" class="abs script"  style="left:96px; top:140px; font-size:122px;" data-rot="-4">effortless,</div>
-<div id="e_always" class="abs display" style="left:226px; top:292px; font-size:132px;" data-fit="680">ALWAYS.</div>
+<!-- One title, written the way a creator would say it: lowercase, no taglines, no rules. -->
+<div id="h_line1" class="abs script" style="left:96px; top:146px; font-size:122px;">obsessing over</div>
+<div id="h_line2" class="abs caption" style="left:100px; top:322px; font-size:46px;">these non tarnish bracelets</div>
 
 <script>
 const TL = window.__TL || {fps: 30, duration: 16, shots: []};
@@ -56,28 +47,23 @@ function prepare() {
     while (el.getBoundingClientRect().width > max && fs > 20) { fs -= 2; el.style.fontSize = fs + 'px'; }
     el.style.opacity = 0;
   });
+  document.querySelectorAll('.caption').forEach(el => {
+    el.innerHTML = el.textContent.split(' ').map(w => `<span class="word">${w}</span>`).join(' ');
+  });
   document.querySelectorAll('.display').forEach(el => {
     el.innerHTML = '<span class="line">' + [...el.textContent].map(c => `<span class="ch">${c}</span>`).join('') + '</span>';
   });
 }
 
-// letters: staggered masked rise · wipe: handwriting-style reveal · rule: hairline draw
+// wipe: handwriting-style reveal · words: word-by-word soft rise
 // every cue exits with a soft lift, fade and defocus
 const CUES = [];
 const cue = (id, type, tin, tout, o = {}) => CUES.push({id, type, tin, tout, dur: o.dur || .5, stag: o.stag || .05, exit: o.exit || .2});
 
 function build() {
   const h1 = en('hook') - .02;
-  cue('h_build', 'wipe', .05, h1, {dur: .6, exit: .16});
-  cue('h_stack', 'letters', .2, h1, {dur: .6, stag: .055, exit: .16});
-
-  const d0 = st('detail_a') + .3, d1 = en('detail_a') - .2;
-  cue('d_rule', 'rule', d0, d1, {dur: .45, exit: .25});
-  cue('d_label', 'rise', d0 + .18, d1, {dur: .6, exit: .25});
-
-  const e0 = st('endcard') + .35, e1 = TL.duration;
-  cue('e_script', 'wipe', e0, e1, {dur: .8, exit: .33});
-  cue('e_always', 'letters', e0 + .4, e1, {dur: .65, stag: .05, exit: .33});
+  cue('h_line1', 'wipe', .05, h1, {dur: .65, exit: .16});
+  cue('h_line2', 'words', .35, h1, {dur: .45, stag: .07, exit: .16});
 }
 
 function render(t) {
@@ -108,6 +94,15 @@ function render(t) {
       el.querySelectorAll('.ch').forEach((ch, i) => {
         const q = expo(clamp((t - c.tin - i * c.stag) / c.dur));
         ch.style.transform = `translateY(${(1 - q) * 105}%)`;
+      });
+    } else if (c.type === 'words') {
+      el.style.opacity = xo;
+      el.style.transform = `translateY(${xy}px)`;
+      el.style.filter = `blur(${xb}px)`;
+      el.querySelectorAll('.word').forEach((w, i) => {
+        const q = cubic(clamp((t - c.tin - i * c.stag) / c.dur));
+        w.style.opacity = q;
+        w.style.transform = `translateY(${(1 - q) * 14}px)`;
       });
     } else if (c.type === 'rule') {
       el.style.opacity = xo;

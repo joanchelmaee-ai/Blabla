@@ -11,7 +11,7 @@
     {"name": "build", "shots": ["n01", "n02", "n03", "n04", "n05_act"], "zoom": [1.03, 1.10], "center": [0.52, 0.62]}
   ],
   "shots": [
-    {"id": "hook",     "src": "close_b",     "in": 0.30, "speed": 0.62, "dur": 2.10, "zoom": [1.12, 1.03], "center": [0.5, 0.45]},
+    {"id": "hook",     "src": "close_b",     "in": 0.30, "speed": 0.62, "dur": 2.80, "zoom": [1.12, 1.03], "center": [0.5, 0.45]},
     {"id": "n01",      "src": "stack_build", "in": 25.00, "speed": 1.0, "dur": 1.00,
      "trans_in": {"type": "zoom", "frames": 6, "focus_out": [0.5, 0.45], "focus_in": [0.62, 0.82]}},
     {"id": "n02",      "src": "stack_build", "in": 41.40, "speed": 1.0, "dur": 0.75, "trans_in": {"type": "pop", "frames": 3}},
@@ -22,7 +22,7 @@
     {"id": "detail_a", "src": "close_a",     "in": 0.30, "speed": 0.7, "dur": 2.30, "zoom": [1.12, 1.03], "center": [0.5, 0.4],
      "trans_in": {"type": "zoom", "frames": 6, "focus_out": [0.6, 0.72], "focus_in": [0.5, 0.5]}},
     {"id": "detail_b", "src": "close_c",     "in": 4.00, "speed": 0.7, "dur": 2.00, "zoom": [1.02, 1.10], "center": [0.5, 0.45], "trans_in": {"type": "blur", "frames": 9}},
-    {"id": "endcard",  "src": "close_b",     "in": 2.40, "speed": 0.75, "dur": 3.20, "zoom": [1.00, 1.08], "center": [0.5, 0.45], "trans_in": {"type": "blur", "frames": 9}, "fade_out": 10}
+    {"id": "endcard",  "src": "close_b",     "in": 2.40, "speed": 0.75, "dur": 2.80, "zoom": [1.00, 1.08], "center": [0.5, 0.45], "trans_in": {"type": "blur", "frames": 9}, "fade_out": 10}
   ],
   "sfx": [
     {"type": "whoosh", "at": "n01", "offset": -0.15, "gain": 0.8},
