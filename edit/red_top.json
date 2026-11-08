@@ -1,0 +1,21 @@
+{
+  "fps": 30,
+  "size": [1080, 1920],
+  "typography": false,
+  "grade": "edit/grade_natural.txt",
+  "wb_lock": {"region": [0.60, 0.05, 0.78, 0.12], "ref_src": "on", "ref_t": 20.0, "luma_strength": 0.5},
+  "music": {"bpm": 100, "kick_from_beat": 8,
+            "chords": [["D3", "F#3", "A3", "C#4"], ["B2", "D3", "F#3", "A3"], ["G3", "B3", "D4", "F#4"], ["A3", "C#4", "E4", "F#4"]]},
+  "sources": {"show": "raw/proxy/clip_35307.mp4", "on": "raw/proxy/clip_35304.mp4"},
+  "shots": [
+    {"id": "this_top", "src": "show", "in": 1.00,  "speed": 1.0, "dur": 2.40, "zoom": [1.03, 1.05], "center": [0.5, 0.5]},
+    {"id": "neckline", "src": "show", "in": 13.30, "speed": 1.0, "dur": 1.20, "zoom": [1.04, 1.05], "center": [0.5, 0.5]},
+    {"id": "walk_in",  "src": "show", "in": 16.90, "out": 18.40, "ramp_shape": "in", "ramp": 0.4, "dur": 1.20,
+     "zoom": [1.04, 1.04], "center": [0.5, 0.45]},
+    {"id": "wearing",  "src": "on",   "in": 0.00,  "speed": 1.0, "dur": 2.40, "zoom": [1.04, 1.04], "center": [0.5, 0.5]},
+    {"id": "hair",     "src": "on",   "in": 13.90, "speed": 1.0, "dur": 1.20, "zoom": [1.04, 1.05], "center": [0.5, 0.5]},
+    {"id": "turn",     "src": "on",   "in": 25.10, "speed": 1.0, "dur": 1.20, "zoom": [1.04, 1.05], "center": [0.5, 0.5]},
+    {"id": "finale",   "src": "on",   "in": 35.60, "speed": 1.0, "dur": 2.40, "zoom": [1.03, 1.07], "ease": "out", "center": [0.5, 0.45]}
+  ],
+  "sfx": []
+}

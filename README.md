@@ -10,7 +10,8 @@ Minimal, editorial TikTok affiliate edits (1080×1920, 30 fps): a soft shared gr
 | Glasses + pouch | `out/glasses/final_1080x1920.mp4` | 6.2s | none (no on-screen text) |
 | Olive babydoll top | `out/olive_top/final_1080x1920.mp4` | 7.3s | none (no on-screen text) |
 | Polka-dot peplum top, reel 1 "the reveal" | `out/polka_top_reveal/final_1080x1920.mp4` | 7.9s | none (no on-screen text) |
-| Polka-dot peplum top, reel 2 "angles" | `out/polka_top_angles/final_1080x1920.mp4` | 6.8s | none (no on-screen text) |
+| Polka-dot peplum top, reel 2 "angles" | `out/polka_top_angles/final_1080x1920.mp4` | 7.2s | none (no on-screen text) |
+| Red off-the-shoulder top (item → try-on) | `out/red_top/final_1080x1920.mp4` | 12.0s | none (no on-screen text) |
 
 Each `out/<project>/` folder also has `contact_sheet.jpg` and `previews/`. Put "linked below" in the post caption, next to the shop tag.
 
@@ -89,6 +90,19 @@ The three 3:54 PM takes (`raw/proxy/clip_35414/16/17.mp4`) repeat the same routi
 
 The camera's auto white balance and exposure drift during these takes (it flickers purple and yellow). Both edits use the renderer's `wb_lock`: every frame is corrected so a plain-wall patch (`region`) matches the same patch in a reference frame. Colour is locked fully and brightness at half strength, smoothed over time.
 
+## Red off-the-shoulder top: item → try-on (Instagram Reels style)
+Cut from `raw/proxy/clip_35307.mp4` (presenting the top in a green cami) and `raw/proxy/clip_35304.mp4` (wearing it). Plain cuts only, all on the beat of a 100 BPM original track (Dmaj7 → Bm7 → Gmaj7 → A). The drums drop exactly on the outfit change. The edit uses the natural grade, colour lock and AI upscaling.
+
+| Time | Bars | Shot |
+|---|---|---|
+| 0.0–2.4 | 1 | Lifts the red top up to camera (establishes subject and product) |
+| 2.4–3.6 | 2 | Holds it by the shoulders: the off-the-shoulder neckline |
+| 3.6–4.8 | 2 | Walks into the lens, speeding into the cut |
+| 4.8–7.2 | 3 | Cut to her wearing it, adjusting the sleeves (beat drops here) |
+| 7.2–8.4 | 4 | Hair touch |
+| 8.4–9.6 | 4 | Turns to show the back |
+| 9.6–12.0 | 5 | Finale: steps closer, hair flip, arms open (the most energetic moment), easing push |
+
 The camera was bumped slightly partway through the power strip's plugging section. The renderer corrects this automatically (feature-matched alignment to a reference frame, `align_ref` in the edit file) so the stop-motion stays rock-steady.
 
 ## Look
@@ -115,6 +129,7 @@ python3 scripts/render.py glasses          # -> out/glasses/final_1080x1920.mp4
 python3 scripts/render.py olive_top        # -> out/olive_top/final_1080x1920.mp4
 python3 scripts/render.py polka_top_reveal # -> out/polka_top_reveal/final_1080x1920.mp4
 python3 scripts/render.py polka_top_angles # -> out/polka_top_angles/final_1080x1920.mp4
+python3 scripts/render.py red_top          # -> out/red_top/final_1080x1920.mp4
 ```
 - `edit/<project>.json`: the timeline (source in/out, speed and ramps (`ramp_shape`: bell / in / out), zoom/center moves and easing, shared camera moves, alignment, `wb_lock` colour stabilisation, transitions, SFX)
 - `type/<project>.html`: the title layout and animation, locked to the shot timing (an edit with `"typography": false` renders with no text; the overlay files are kept in case a title comes back)
