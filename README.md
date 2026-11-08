@@ -91,9 +91,18 @@ The camera was bumped slightly partway through the power strip's plugging sectio
 - **Fonts** (`type/fonts`, all OFL licensed): Pinyon Script for the cursive line, and Montserrat as a stand-in for Gotham on the lowercase line. To use real Gotham, drop the file in and edit its `@font-face` rule in `type/<project>.html`.
 - **Audio:** a silent-ready bed (room tone, soft clinks or plug clicks as items appear, airy whooshes on transitions), kept low so a trending sound added in the TikTok app sits on top.
 
+- **Quality (always on):**
+  - Phone/WhatsApp footage is low resolution (e.g. 464×832), so every enlarged crop goes through an AI upscaler: Real-ESRGAN compact x4 (`realesr-general-x4v3`), which is trained on real-world degradations including compression.
+  - It runs on CPU via onnxruntime. `scripts/build_sr_model.py` builds it from the official weights with a weights-only loader, and does so automatically on first render.
+  - A light temporal denoise runs before upscaling so the result stays stable from frame to frame.
+  - Export: H.264 High at CRF 14 with `aq-mode=3` (less banding on white walls and desks), bt709, AAC 192k. That's roughly 15–20 Mbps, well above what TikTok re-encodes to.
+  - `--draft` skips the upscaler for quick previews.
+  - On the glasses reel this raised measured detail 2–3× and lowered frame-to-frame shimmer by about 20%.
+
 ## Re-render
 ```
-pip install numpy opencv-python-headless   # plus ffmpeg, node + playwright (chromium)
+pip install numpy opencv-python-headless onnx onnxruntime   # plus ffmpeg, node + playwright (chromium)
+scripts/render_all.sh                      # every edit, full quality (AI upscaling ~2.5s/frame on CPU)
 python3 scripts/render.py bracelets        # -> out/bracelets/final_1080x1920.mp4
 python3 scripts/render.py power_strip      # -> out/power_strip/final_1080x1920.mp4
 python3 scripts/render.py usb_hub          # -> out/usb_hub/final_1080x1920.mp4
@@ -108,4 +117,4 @@ python3 scripts/render.py polka_top_angles # -> out/polka_top_angles/final_1080x
 - `scripts/render_type.js`: renders the type layer to transparent PNG frames with Playwright
 
 ### Swapping in the original footage
-The current renders use WhatsApp copies in `raw/proxy/` (464×832), upscaled with Lanczos and sharpened. To get sharper renders, put the full-resolution phone originals in `raw/originals/`, point `sources` in the edit file at them, and re-run. The cut timings carry over unchanged. HDR (HLG/PQ) iPhone clips are tone-mapped to SDR automatically.
+The current renders use WhatsApp copies in `raw/proxy/` (464×832 to 576×1024), AI-upscaled to 1080×1920. To get sharper renders, put the full-resolution phone originals in `raw/originals/`, point `sources` in the edit file at them, and re-run. The cut timings carry over unchanged. HDR (HLG/PQ) iPhone clips are tone-mapped to SDR automatically.
