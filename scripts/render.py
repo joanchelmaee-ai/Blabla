@@ -68,6 +68,8 @@ class SourceReader:
         if info["hdr"]:  # iPhone HLG/PQ originals -> SDR bt709
             vf.append("zscale=t=linear:npl=203,format=gbrpf32le,tonemap=hable:desat=0,"
                       "zscale=p=bt709:t=bt709:m=bt709:r=tv")
+        if QUALITY["sr"]:
+            vf.append("hqdn3d=0.8:0.8:2.5:2.5")
         vf.append(f"scale={self.w}:{self.h}:flags=lanczos:in_color_matrix=bt709:in_range=tv")
         vf.append("format=rgb24")
         cmd = ["ffmpeg", "-v", "error", "-ss", f"{self.base:.4f}", "-i", path,
@@ -130,8 +132,35 @@ def lerp(a, b, u):
     return a + (b - a) * u
 
 
+# --------------------------------------------------------------------------- AI upscaling
+QUALITY = {"sr": True}          # set False by --draft for quick previews
+_SR = None
+SR_MODEL = os.path.join(ROOT, "models", "realesr-general-x4v3.onnx")
+
+
+def sr_session():
+    """Real-ESRGAN compact x4 (real-world degradations, incl. compression) via onnxruntime."""
+    global _SR
+    if _SR is None:
+        if not os.path.exists(SR_MODEL):
+            subprocess.run([sys.executable, os.path.join(ROOT, "scripts", "build_sr_model.py")], check=True)
+        import onnxruntime as ort
+        so = ort.SessionOptions()
+        so.intra_op_num_threads = os.cpu_count() or 4
+        _SR = ort.InferenceSession(SR_MODEL, so, providers=["CPUExecutionProvider"])
+    return _SR
+
+
+def ai_upscale(patch):
+    x = patch.astype(np.float32).transpose(2, 0, 1)[None] / 255.0
+    y = sr_session().run(None, {"input": x})[0][0].transpose(1, 2, 0)
+    return (np.clip(y, 0, 1) * 255 + 0.5).astype(np.uint8)
+
+
 def warp_view(img, zoom, center, out_w, out_h, upscale, pre=None):
-    """Sub-pixel crop (9:16) + resize in one affine warp, so slow zooms never jitter."""
+    """Sub-pixel crop (9:16) + resize in one affine warp, so slow zooms never jitter.
+    When the crop has to be enlarged, the crop is cut out at source scale, upscaled 4x by the AI model,
+    then resampled down to the output size, instead of a plain Lanczos stretch."""
     h, w = img.shape[:2]
     target = out_w / out_h
     if w / h > target:
@@ -146,9 +175,20 @@ def warp_view(img, zoom, center, out_w, out_h, upscale, pre=None):
     m = np.array([[s, 0, -x0 * s], [0, s, -y0 * s]], np.float32)
     if pre is not None:  # fold the alignment into the same single resample
         m = (np.vstack([m, [0, 0, 1]]) @ np.vstack([pre, [0, 0, 1]]))[:2].astype(np.float32)
+    if QUALITY["sr"] and s > 1.05:
+        pw, ph = int(round(out_w / s)) + 2, int(round(out_h / s)) + 2   # 1px margin each side
+        mp = m.copy()
+        mp[:, :] /= s
+        mp[0, 2] += 1
+        mp[1, 2] += 1
+        patch = cv2.warpAffine(img, mp, (pw, ph), flags=cv2.INTER_LANCZOS4, borderMode=cv2.BORDER_REFLECT)
+        big = ai_upscale(patch)
+        k = big.shape[1] / pw  # = 4
+        crop = big[int(round(k)):int(round(k * (ph - 1))), int(round(k)):int(round(k * (pw - 1)))]
+        return cv2.resize(crop, (out_w, out_h), interpolation=cv2.INTER_AREA)
     interp = cv2.INTER_LANCZOS4 if s > 1 else cv2.INTER_AREA
     out = cv2.warpAffine(img, m, (out_w, out_h), flags=interp, borderMode=cv2.BORDER_REFLECT)
-    if s > 1.15:  # recover some crispness lost to upscaling (proxies); gentle on originals
+    if s > 1.15:  # draft mode: recover some crispness lost to plain upscaling
         amt = min(0.9, 0.35 * (s - 1.0))
         blur = cv2.GaussianBlur(out, (0, 0), 1.6)
         out = cv2.addWeighted(out, 1 + amt, blur, -amt, 0)
@@ -452,8 +492,10 @@ def main():
     ap.add_argument("--out", help="default: out/<project>/final_1080x1920.mp4")
     ap.add_argument("--skip-type", action="store_true", help="reuse the rendered type frames")
     ap.add_argument("--no-type", action="store_true", help="render without typography")
+    ap.add_argument("--draft", action="store_true", help="fast preview: plain Lanczos instead of AI upscaling")
     args = ap.parse_args()
     args.out = args.out or f"out/{args.project}/final_1080x1920.mp4"
+    QUALITY["sr"] = not args.draft
     BUILD = os.path.join(ROOT, "build", args.project)
 
     edl = json.load(open(rel(f"edit/{args.project}.json")))
@@ -485,9 +527,10 @@ def main():
         fc = f"[0:v]format=gbrp,{grade}[g];[1:v]format=rgba[t];[g][t]overlay=0:0:format=gbrp:shortest=1[c];"
         amap = "2:a"
     fc += ("[c]scale=out_color_matrix=bt709:out_range=tv,format=yuv444p,"
-           "noise=c0s=3:c0f=t,format=yuv420p[v]")
+           "noise=c0s=2:c0f=t,format=yuv420p[v]")
     cmd += ["-i", wav, "-filter_complex", fc, "-map", "[v]", "-map", amap,
-            "-c:v", "libx264", "-preset", "slow", "-crf", "16", "-profile:v", "high",
+            "-c:v", "libx264", "-preset", "slow", "-crf", "14", "-profile:v", "high",
+            "-x264-params", "aq-mode=3:aq-strength=0.9:deblock=-1,-1",
             "-pix_fmt", "yuv420p", "-colorspace", "bt709", "-color_primaries", "bt709",
             "-color_trc", "bt709", "-color_range", "tv",
             "-c:a", "aac", "-b:a", "192k", "-ar", "48000",

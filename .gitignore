@@ -2,3 +2,4 @@ build/
 __pycache__/
 # full-resolution originals can exceed GitHub's 100 MB limit — keep them local (or use Git LFS)
 raw/originals/
+models/
