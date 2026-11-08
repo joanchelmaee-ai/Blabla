@@ -1,6 +1,7 @@
 {
   "fps": 30,
   "size": [1080, 1920],
+  "typography": false,
   "sources": {
     "strip": "raw/proxy/clip_11313.mp4"
   },

@@ -1,13 +1,13 @@
 # Editorial TikTok edits
 
-Minimal, editorial TikTok affiliate edits (1080×1920, 30 fps). Each one has a single natural-sounding title, a soft shared grade, locked-off stop-motion, and gentle transitions. Each product is its own project:
+Minimal, editorial TikTok affiliate edits (1080×1920, 30 fps): a soft shared grade, locked-off stop-motion, gentle transitions, and at most one natural-sounding title. Each product is its own project:
 
 | Project | Deliverable | Length | Title |
 |---|---|---|---|
 | Non-tarnish bracelets | `out/bracelets/final_1080x1920.mp4` | 15.7s | *obsessing over* / these non tarnish bracelets |
-| Power strip | `out/power_strip/final_1080x1920.mp4` | 15.3s | *the desk upgrade* / i didn't know i needed |
+| Power strip | `out/power_strip/final_1080x1920.mp4` | 15.3s | none (no on-screen text) |
 
-Each `out/<project>/` folder also has `contact_sheet.jpg`, `safezone_check.jpg` (TikTok UI zones overlaid on the title frame) and `previews/`. Put "linked below" in the post caption, next to the shop tag.
+Each `out/<project>/` folder also has `contact_sheet.jpg` and `previews/`; the bracelets folder also has `safezone_check.jpg` (TikTok UI zones overlaid on the title frame). Put "linked below" in the post caption, next to the shop tag.
 
 ## Bracelets: beat by beat
 | Time | Shot | Transition in |
@@ -21,7 +21,7 @@ Each `out/<project>/` folder also has `contact_sheet.jpg`, `safezone_check.jpg` 
 ## Power strip: beat by beat
 | Time | Shot | Transition in |
 |---|---|---|
-| 0.0–3.0 | Strip held up to camera, slow-mo pull-out, with the title over a soft haze | — |
+| 0.0–3.0 | Strip held up to camera, slow-mo pull-out | — |
 | 3.0–5.2 | Tight slow-mo close-up on the three universal sockets | zoom-through |
 | 4.9–7.4 | The strip in the desk setup | soft-focus dissolve |
 | 7.1–11.9 | Locked-off stop-motion: plugs appear one by one with soft clicks; the black adapter goes in by hand with a speed ramp | zoom-through, then pop fades |
@@ -41,7 +41,7 @@ python3 scripts/render.py bracelets        # -> out/bracelets/final_1080x1920.mp
 python3 scripts/render.py power_strip      # -> out/power_strip/final_1080x1920.mp4
 ```
 - `edit/<project>.json`: the timeline (source in/out, speed and ramps, zoom/center moves, shared camera moves, alignment, transitions, SFX)
-- `type/<project>.html`: the title layout and animation, locked to the shot timing
+- `type/<project>.html`: the title layout and animation, locked to the shot timing (an edit with `"typography": false` renders with no text; `type/power_strip.html` is kept in case the title comes back)
 - `scripts/render.py`: cuts, ramps, zooms, alignment and transitions, then grades, composites the type and encodes
 - `scripts/render_type.js`: renders the type layer to transparent PNG frames with Playwright
 

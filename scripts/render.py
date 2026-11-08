@@ -412,6 +412,8 @@ def main():
     BUILD = os.path.join(ROOT, "build", args.project)
 
     edl = json.load(open(rel(f"edit/{args.project}.json")))
+    if edl.get("typography") is False:  # an edit can opt out of on-screen text entirely
+        args.no_type = True
     os.makedirs(BUILD, exist_ok=True)
     os.makedirs(os.path.dirname(rel(args.out)), exist_ok=True)
     tl = build_timeline(edl)
