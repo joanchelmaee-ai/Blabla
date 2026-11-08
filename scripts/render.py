@@ -163,13 +163,30 @@ def motion_blur(img, length, dx):
     return cv2.warpAffine(blurred, m, (img.shape[1], img.shape[0]), borderMode=cv2.BORDER_REFLECT)
 
 
+# --------------------------------------------------------------------------- transitions
+OVERLAP = ("dissolve", "pop", "blur")  # transitions where the two shots overlap in time
+
+
+def punch(img, scale, focus, sigma):
+    """Scale an output frame about `focus` (normalized) and soften it - used by the zoom-through."""
+    h, w = img.shape[:2]
+    if scale > 1.001:
+        cx, cy = focus[0] * w, focus[1] * h
+        m = np.array([[scale, 0, (1 - scale) * cx], [0, scale, (1 - scale) * cy]], np.float32)
+        img = cv2.warpAffine(img, m, (w, h), flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_REFLECT)
+    if sigma > 0.3:
+        img = cv2.GaussianBlur(img, (0, 0), sigma)
+    return img
+
+
 # --------------------------------------------------------------------------- timeline
 def build_timeline(edl):
     fps = edl["fps"]
     shots, t = [], 0
     for s in edl["shots"]:
         n = int(round(s["dur"] * fps))
-        ov = s.get("trans_in", {}).get("frames", 0) if s.get("trans_in", {}).get("type") == "dissolve" else 0
+        tr = s.get("trans_in", {})
+        ov = tr.get("frames", 0) if tr.get("type") in OVERLAP else 0
         start = t - ov
         shots.append({"id": s["id"], "start_frame": start, "frames": n,
                       "start": start / fps, "dur": n / fps})
@@ -177,14 +194,30 @@ def build_timeline(edl):
     return {"fps": fps, "size": edl["size"], "total_frames": t, "duration": t / fps, "shots": shots}
 
 
-def shot_frames(spec, reader, fps, size):
+def camera_for(spec, edl, tl):
+    """A shot either moves on its own, or shares one continuous camera move with a group of shots
+    (so a stop-motion sequence reads as a single slow push rather than restarting at every cut)."""
+    by_id = {s["id"]: s for s in tl["shots"]}
+    for cam in edl.get("cameras", []):
+        if spec["id"] in cam["shots"]:
+            g0 = by_id[cam["shots"][0]]["start_frame"]
+            last = by_id[cam["shots"][-1]]
+            g1 = last["start_frame"] + last["frames"] - 1
+            return cam, g0, g1
+    me = by_id[spec["id"]]
+    return spec, me["start_frame"], me["start_frame"] + me["frames"] - 1
+
+
+def shot_frames(spec, reader, edl, tl):
     """Yield the output frames of one shot."""
+    fps, (out_w, out_h) = edl["fps"], edl["size"]
     n = int(round(spec["dur"] * fps))
-    out_w, out_h = size
-    z0, z1 = spec.get("zoom", [1, 1])
-    center = spec.get("center", [0.5, 0.5])
-    center_end = spec.get("center_end", center)
-    zease = ease_inout if spec.get("ease") == "inout" else (lambda u: u)
+    me = next(s for s in tl["shots"] if s["id"] == spec["id"])
+    cam, g0, g1 = camera_for(spec, edl, tl)
+    z0, z1 = cam.get("zoom", [1, 1])
+    center = cam.get("center", [0.5, 0.5])
+    center_end = cam.get("center_end", center)
+    zease = ease_inout if cam.get("ease") == "inout" else (lambda u: u)
     shutter = spec.get("shutter", 0.5)
     for k in range(n):
         if "out" in spec:  # speed ramp: slow -> fast -> slow, covering [in, out] in `dur`
@@ -198,46 +231,52 @@ def shot_frames(spec, reader, fps, size):
             ta = spec["in"] + k / fps * sp
             tb = ta + sp / fps
         src = reader.blended(ta, ta + shutter * (tb - ta))
-        u = k / max(1, n - 1)
-        e = zease(u)
+        u = (me["start_frame"] + k - g0) / max(1, g1 - g0)
+        e = zease(min(1.0, max(0.0, u)))
         c = (lerp(center[0], center_end[0], e), lerp(center[1], center_end[1], e))
         yield warp_view(src, lerp(z0, z1, e), c, out_w, out_h, True)
 
 
 def video_frames(edl, tl):
-    fps, size = edl["fps"], edl["size"]
+    fps = edl["fps"]
     infos = {k: probe(rel(v)) for k, v in edl["sources"].items()}
-    pending = []  # frames held back for a dissolve into the next shot
+    pending = []  # outgoing frames held back for an overlapping transition into the next shot
     shots = edl["shots"]
     for si, spec in enumerate(shots):
         reader = SourceReader(rel(edl["sources"][spec["src"]]), spec["in"], infos[spec["src"]])
-        frames = shot_frames(spec, reader, fps, size)
+        frames = shot_frames(spec, reader, edl, tl)
         tin = spec.get("trans_in", {})
         nxt = shots[si + 1] if si + 1 < len(shots) else None
         ntr = (nxt or {}).get("trans_in", {})
-        hold = ntr.get("frames", 0) if ntr.get("type") == "dissolve" else 0
-        whip_out = ntr.get("frames", 0) if ntr.get("type") == "whip" else 0
+        hold = ntr.get("frames", 0) if ntr.get("type") in OVERLAP else 0
         n = int(round(spec["dur"] * fps))
         fade_out = spec.get("fade_out", 0)
         tail = []
         n_pend = len(pending)
         for k, fr in enumerate(frames):
-            # incoming transition
-            if tin.get("type") == "dissolve" and pending:
+            # ---- incoming
+            if tin.get("type") in OVERLAP and pending:
                 a = ease_inout((k + 1) / (n_pend + 1))
-                prev = pending.pop(0)
-                fr = cv2.addWeighted(prev, 1 - a, fr, a, 0)
+                fr = cv2.addWeighted(pending.pop(0), 1 - a, fr, a, 0)
+                if tin["type"] == "blur":  # soft-focus dissolve: defocus peaks mid-blend
+                    fr = punch(fr, 1.0, (0.5, 0.5), 7 * math.sin(math.pi * a))
+            elif tin.get("type") == "zoom" and k < tin["frames"]:
+                p = 1 - k / tin["frames"]  # B arrives punched-in and settles
+                fr = punch(fr, 1 + 0.32 * p * p, tin.get("focus_in", (0.5, 0.5)), 9 * p * p)
             elif tin.get("type") == "whip" and k < tin["frames"]:
-                p = 1 - k / tin["frames"]  # strongest right after the cut
+                p = 1 - k / tin["frames"]
                 fr = motion_blur(fr, 1 + 140 * p, 90 * p)
-            # outgoing transition
-            if whip_out and k >= n - whip_out:
-                p = (k - (n - whip_out) + 1) / whip_out
+            # ---- outgoing
+            if ntr.get("type") == "zoom" and k >= n - ntr["frames"]:
+                p = (k - (n - ntr["frames"]) + 1) / ntr["frames"]  # A accelerates into the cut
+                fr = punch(fr, 1 + 0.32 * p * p, ntr.get("focus_out", (0.5, 0.5)), 9 * p * p)
+            elif ntr.get("type") == "whip" and k >= n - ntr["frames"]:
+                p = (k - (n - ntr["frames"]) + 1) / ntr["frames"]
                 fr = motion_blur(fr, 1 + 140 * p, -90 * p)
             if fade_out and k >= n - fade_out:
-                a = (k - (n - fade_out) + 1) / fade_out
+                a = ease_inout((k - (n - fade_out) + 1) / fade_out)
                 paper = np.full_like(fr, (246, 243, 238))
-                fr = cv2.addWeighted(fr, 1 - ease_inout(a), paper, ease_inout(a), 0)
+                fr = cv2.addWeighted(fr, 1 - a, paper, a, 0)
             if hold and k >= n - hold:
                 tail.append(fr)
                 continue
