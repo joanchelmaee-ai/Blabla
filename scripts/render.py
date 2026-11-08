@@ -24,6 +24,8 @@ from collections import OrderedDict
 import cv2
 import numpy as np
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -115,6 +117,18 @@ class SourceReader:
             acc += self.frame_at_index(i)
         return (acc / (i1 - i0 + 1)).astype(np.uint8)
 
+    def interpolated(self, t):
+        """Frame at an exact time between two source frames, synthesized with optical flow
+        (keeps slow motion smooth on 30 fps phone footage instead of stuttering repeats)."""
+        x = (t - self.base) * self.fps
+        a = int(np.floor(x))
+        f = x - a
+        if f < 0.08:
+            return self.frame_at_index(max(0, a))
+        if f > 0.92:
+            return self.frame_at_index(a + 1)
+        return flow_interp(self.frame_at_index(max(0, a)), self.frame_at_index(a + 1), f)
+
     def close(self):
         try:
             self.proc.stdout.close()
@@ -124,6 +138,27 @@ class SourceReader:
 
 
 # --------------------------------------------------------------------------- helpers
+_DIS = None
+
+
+def flow_interp(A, B, f):
+    """Intermediate frame at fraction f between A and B (bidirectional DIS flow, Super-SloMo style blend)."""
+    global _DIS
+    if _DIS is None:
+        _DIS = cv2.DISOpticalFlow_create(cv2.DISOPTICAL_FLOW_PRESET_MEDIUM)
+    h, w = A.shape[:2]
+    ga = cv2.cvtColor(A, cv2.COLOR_RGB2GRAY)
+    gb = cv2.cvtColor(B, cv2.COLOR_RGB2GRAY)
+    fab = _DIS.calc(ga, gb, None)
+    fba = _DIS.calc(gb, ga, None)
+    fta = -(1 - f) * f * fab + f * f * fba
+    ftb = (1 - f) ** 2 * fab - f * (1 - f) * fba
+    gx, gy = np.meshgrid(np.arange(w, dtype=np.float32), np.arange(h, dtype=np.float32))
+    wa = cv2.remap(A, gx + fta[..., 0], gy + fta[..., 1], cv2.INTER_LINEAR, borderMode=cv2.BORDER_REFLECT)
+    wb = cv2.remap(B, gx + ftb[..., 0], gy + ftb[..., 1], cv2.INTER_LINEAR, borderMode=cv2.BORDER_REFLECT)
+    return cv2.addWeighted(wa, 1 - f, wb, f, 0)
+
+
 def ease_inout(u):
     return u * u * (3 - 2 * u)
 
@@ -344,7 +379,10 @@ def shot_frames(spec, reader, edl, tl, info=None):
             sp = spec.get("speed", 1.0)
             ta = spec["in"] + k / fps * sp
             tb = ta + sp / fps
-        src = reader.blended(ta, ta + shutter * (tb - ta))
+        if (tb - ta) < 0.9 / reader.fps:  # slower than the source frame rate: interpolate, don't repeat
+            src = reader.interpolated(ta)
+        else:
+            src = reader.blended(ta, ta + shutter * (tb - ta))
         if wb:
             g = wb_gains(src, wb, target)
             gains = g if gains is None else 0.75 * gains + 0.25 * g  # smooth so the lock never pumps
@@ -409,6 +447,23 @@ SR = 48000
 
 def synth_audio(edl, tl, path):
     total = tl["duration"]
+    if edl.get("music"):
+        import music
+        m = edl["music"]
+        beat = 60.0 / m["bpm"]
+        beats = int(np.ceil(total / beat))
+        mix = music.render(m["bpm"], beats, m["chords"], m.get("kick_from_beat", 0))
+        n_total = int(total * SR)
+        mix = mix[:n_total]
+        fade = int(0.03 * SR)
+        mix[-fade:] *= np.linspace(1, 0, fade)[:, None]
+        pcm = (np.clip(mix, -1, 1) * 32767).astype(np.int16)
+        with wave.open(path, "wb") as w:
+            w.setnchannels(2)
+            w.setsampwidth(2)
+            w.setframerate(SR)
+            w.writeframes(pcm.tobytes())
+        return
     n = int(total * SR) + SR // 2
     rng = np.random.default_rng(7)
     mix = np.zeros((n, 2), np.float32)
@@ -514,7 +569,7 @@ def main():
     wav = os.path.join(BUILD, "audio.wav")
     synth_audio(edl, tl, wav)
 
-    grade = open(rel("edit/grade.txt")).read().strip()
+    grade = open(rel(edl.get("grade", "edit/grade.txt"))).read().strip()
     w, h = edl["size"]
     fps = edl["fps"]
     cmd = ["ffmpeg", "-v", "error", "-y",
@@ -533,6 +588,7 @@ def main():
             "-x264-params", "aq-mode=3:aq-strength=0.9:deblock=-1,-1",
             "-pix_fmt", "yuv420p", "-colorspace", "bt709", "-color_primaries", "bt709",
             "-color_trc", "bt709", "-color_range", "tv",
+            *(["-af", "loudnorm=I=-14:TP=-1.5:LRA=11"] if edl.get("music") else []),
             "-c:a", "aac", "-b:a", "192k", "-ar", "48000",
             "-movflags", "+faststart", "-shortest", rel(args.out)]
     enc = subprocess.Popen(cmd, stdin=subprocess.PIPE)

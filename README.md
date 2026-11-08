@@ -74,13 +74,18 @@ The three 3:54 PM takes (`raw/proxy/clip_35414/16/17.mp4`) repeat the same routi
 | 5.0–5.7 | Turns back to the front | real speed | cut |
 | 5.7–7.9 | Final pose | ease-out push, soft fade into the loop | 3-frame pop |
 
-**Reel 2, "angles"**
-| Time | Shot | Motion | Transition in |
+**Reel 2, "angles"** (revised for Instagram Reels: clean cuts on the beat, natural grade, original music)
+| Time | Beat | Shot | Notes |
 |---|---|---|---|
-| 0.0–1.1 | Side-profile turn, waist-up | fast pull-back | — |
-| 1.0–3.7 | Pose montage alternating full-length and waist-up crops (polka dots, peplum) across takes | small punch zooms | 2-frame pops on the beat |
-| 3.7–4.8 | Turns to show the back | real speed | zoom-through |
-| 4.6–6.8 | Final pose | ease-out push, soft fade into the loop | soft-focus dissolve |
+| 0.0–1.8 | 1–3 | Full-length power pose: arms move to the hips | establishes subject and outfit in the first second |
+| 1.8–3.0 | 4–5 | The one close-up: waist-up on the polka dots and peplum | drums come in on this cut |
+| 3.0–4.2 | 6–7 | Relaxed front stance, hands in pockets | |
+| 4.2–5.4 | 8–9 | Turns to side profile with a look back | cut on her movement |
+| 5.4–7.2 | 10–12 | Turns to the back and lands on an over-the-shoulder glance | eases into motion-interpolated slow motion for a smooth ending |
+
+- **Cuts and framing:** plain cuts only (no zooms, blurs or flashes), all on the beat of a 100 BPM track. Consistent full-length framing, with a single close-up.
+- **Grade** (`edit/grade_natural.txt`): neutral white wall, natural skin warmth, soft highlight roll-off, mild contrast. Plus `wb_lock` against the camera's colour drift, and AI upscaling.
+- **Music** (`scripts/music.py`): an original groove synthesized from scratch (e-piano stabs, soft pad, sub bass, light drums), so there are no licensing issues. Chords are Fmaj7 → Em7 → Am7, written to loop seamlessly. Loudness is normalised to −14 LUFS for Instagram/TikTok.
 
 The camera's auto white balance and exposure drift during these takes (it flickers purple and yellow). Both edits use the renderer's `wb_lock`: every frame is corrected so a plain-wall patch (`region`) matches the same patch in a reference frame. Colour is locked fully and brightness at half strength, smoothed over time.
 
