@@ -1,0 +1,17 @@
+{
+  "fps": 30,
+  "size": [1080, 1920],
+  "typography": false,
+  "wb_lock": {"region": [0.60, 0.05, 0.78, 0.12], "ref_src": "t19", "ref_t": 4.8, "luma_strength": 0.5},
+  "music": {"bpm": 100, "kick_from_beat": 4,
+            "chords": [["G3", "A#3", "D4", "F4"], ["D#3", "G3", "A#3", "D4"], ["A#3", "D4", "F4", "A4"], ["F3", "A3", "C4", "E4"]]},
+  "sources": {"t19": "raw/proxy/clip_35519.mp4", "t11": "raw/proxy/clip_35611.mp4"},
+  "shots": [
+    {"id": "arms_up",  "src": "t11", "in": 1.80,  "speed": 1.0,  "dur": 2.40, "zoom": [1.03, 1.05], "center": [0.5, 0.5]},
+    {"id": "wings",    "src": "t19", "in": 8.00,  "speed": 1.0,  "dur": 1.20, "zoom": [1.04, 1.05], "center": [0.5, 0.5]},
+    {"id": "hip",      "src": "t19", "in": 4.40,  "speed": 1.0,  "dur": 1.20, "zoom": [1.04, 1.05], "center": [0.5, 0.5]},
+    {"id": "shoulder", "src": "t11", "in": 17.60, "speed": 1.0,  "dur": 1.20, "zoom": [1.04, 1.05], "center": [0.5, 0.5]},
+    {"id": "hair_end", "src": "t11", "in": 19.40, "speed": 0.97, "dur": 2.40, "zoom": [1.03, 1.06], "ease": "out", "center": [0.5, 0.47]}
+  ],
+  "sfx": []
+}

@@ -17,6 +17,7 @@ Minimal, editorial TikTok affiliate edits (1080×1920, 30 fps): a soft shared gr
 | Printed halter top | `out/print_halter/final_1080x1920.mp4` | 9.6s | none (no on-screen text) |
 | Black tee + denim mini skirt | `out/black_tee_denim/final_1080x1920.mp4` | 8.4s | none (no on-screen text) |
 | Cream cardigan + bandeau + black mini | `out/cream_cardigan/final_1080x1920.mp4` | 9.6s | none (no on-screen text) |
+| White draped top + black shorts | `out/white_drape_top/final_1080x1920.mp4` | 8.4s | none (no on-screen text) |
 
 Each `out/<project>/` folder also has `contact_sheet.jpg` and `previews/`. Put "linked below" in the post caption, next to the shop tag.
 
@@ -165,6 +166,17 @@ Cut from `raw/proxy/clip_35507.mp4` and `raw/proxy/clip_35510.mp4`. Plain cuts o
 | 6.0–7.2 | Spin with hair and cardigan flaring (slight slow motion) |
 | 7.2–9.6 | Playful leg-pop pose, rising into the final pose |
 
+## White asymmetric draped top + black shorts: one reel from two takes
+Cut from `raw/proxy/clip_35519.mp4` and `raw/proxy/clip_35611.mp4`. Plain cuts on the beat at 100 BPM, airy original music (Gm7 → E♭maj7 → B♭maj7 → Fmaj7), true as-filmed colour with highlight-protected `wb_lock` (the camera darkened and warmed as the white top filled the frame), AI upscaling with detail transfer, and no clipping on the white fabric.
+
+| Time | Shot |
+|---|---|
+| 0.0–2.4 | Full length: arms rise into her hair, showing the drape's shape |
+| 2.4–3.6 | Holds the hem out like wings: the poncho silhouette (drums enter) |
+| 3.6–4.8 | Hand-on-hip pose |
+| 4.8–6.0 | Hand-to-shoulder pose |
+| 6.0–8.4 | Closer, relaxed hands-in-hair final pose (easing push) |
+
 The camera was bumped slightly partway through the power strip's plugging section. The renderer corrects this automatically (feature-matched alignment to a reference frame, `align_ref` in the edit file) so the stop-motion stays rock-steady.
 
 ## Look
@@ -197,6 +209,7 @@ python3 scripts/render.py green_cami_playful # -> out/green_cami_playful/final_1
 python3 scripts/render.py print_halter     # -> out/print_halter/final_1080x1920.mp4
 python3 scripts/render.py black_tee_denim  # -> out/black_tee_denim/final_1080x1920.mp4
 python3 scripts/render.py cream_cardigan   # -> out/cream_cardigan/final_1080x1920.mp4
+python3 scripts/render.py white_drape_top  # -> out/white_drape_top/final_1080x1920.mp4
 ```
 - `edit/<project>.json`: the timeline (source in/out, speed and ramps (`ramp_shape`: bell / in / out), zoom/center moves and easing, shared camera moves, alignment, `wb_lock` colour stabilisation, per-shot `stabilize`, transitions, SFX)
 - `type/<project>.html`: the title layout and animation, locked to the shot timing (an edit with `"typography": false` renders with no text; the overlay files are kept in case a title comes back)
