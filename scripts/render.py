@@ -345,6 +345,49 @@ def wb_gains(img, cfg, target):
     return np.clip(chroma * luma, 0.7, 1.4).astype(np.float32)
 
 
+class Stabilizer:
+    """Locks a shot to its first frame (tripod lock) using background features only: a mask keeps the
+    frame edges and top band, away from the moving subject. Frames with too few reliable matches (the
+    subject covering the background) reuse the last good correction instead of guessing."""
+
+    def __init__(self, ref_rgb):
+        g = cv2.cvtColor(ref_rgb, cv2.COLOR_RGB2GRAY)
+        h, w = g.shape
+        self.mask = np.zeros_like(g)
+        self.mask[:, : int(w * 0.26)] = 255
+        self.mask[:, int(w * 0.78):] = 255
+        self.mask[: int(h * 0.21), :] = 255
+        self.orb = cv2.ORB_create(2000)
+        self.kr, self.dr = self.orb.detectAndCompute(g, self.mask)
+        self.bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
+        self.last = np.array([[1, 0, 0], [0, 1, 0]], np.float32)
+
+    def correction(self, rgb):
+        g = cv2.cvtColor(rgb, cv2.COLOR_RGB2GRAY)
+        k, d = self.orb.detectAndCompute(g, self.mask)
+        if d is None or self.dr is None:
+            return self.last
+        m = sorted(self.bf.match(d, self.dr), key=lambda z: z.distance)[:300]
+        if len(m) < 40:
+            return self.last
+        A, inl = cv2.estimateAffinePartial2D(np.float32([k[z.queryIdx].pt for z in m]),
+                                             np.float32([self.kr[z.trainIdx].pt for z in m]),
+                                             method=cv2.RANSAC, ransacReprojThreshold=1.5)
+        if A is None or inl.sum() < 40 or abs(A[0, 2]) > 40 or abs(A[1, 2]) > 40:
+            return self.last
+        self.last = A.astype(np.float32)
+        return self.last
+
+
+def _compose(a, b):
+    """2x3 affine a applied after 2x3 affine b."""
+    if a is None:
+        return b
+    if b is None:
+        return a
+    return (np.vstack([a, [0, 0, 1]]) @ np.vstack([b, [0, 0, 1]]))[:2].astype(np.float32)
+
+
 def shot_frames(spec, reader, edl, tl, info=None):
     """Yield the output frames of one shot."""
     fps, (out_w, out_h) = edl["fps"], edl["size"]
@@ -362,6 +405,7 @@ def shot_frames(spec, reader, edl, tl, info=None):
     wb = edl.get("wb_lock") if spec.get("wb_lock", True) else None
     target = wb_target(edl) if wb else None
     gains = None
+    stab = None
     for k in range(n):
         if "out" in spec:  # speed ramp covering [in, out] in `dur`
             a = spec.get("ramp", 0.7)
@@ -387,10 +431,15 @@ def shot_frames(spec, reader, edl, tl, info=None):
             g = wb_gains(src, wb, target)
             gains = g if gains is None else 0.75 * gains + 0.25 * g  # smooth so the lock never pumps
             src = np.clip(src.astype(np.float32) * gains, 0, 255).astype(np.uint8)
+        frame_pre = pre
+        if spec.get("stabilize"):
+            if stab is None:
+                stab = Stabilizer(src)
+            frame_pre = _compose(pre, stab.correction(src))
         u = (me["start_frame"] + k - g0) / max(1, g1 - g0)
         e = zease(min(1.0, max(0.0, u)))
         c = (lerp(center[0], center_end[0], e), lerp(center[1], center_end[1], e))
-        yield warp_view(src, lerp(z0, z1, e), c, out_w, out_h, True, pre)
+        yield warp_view(src, lerp(z0, z1, e), c, out_w, out_h, True, frame_pre)
 
 
 def video_frames(edl, tl):

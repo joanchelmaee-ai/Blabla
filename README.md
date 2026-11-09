@@ -12,6 +12,8 @@ Minimal, editorial TikTok affiliate edits (1080×1920, 30 fps): a soft shared gr
 | Polka-dot peplum top, reel 1 "the reveal" | `out/polka_top_reveal/final_1080x1920.mp4` | 7.9s | none (no on-screen text) |
 | Polka-dot peplum top, reel 2 "angles" | `out/polka_top_angles/final_1080x1920.mp4` | 7.2s | none (no on-screen text) |
 | Red off-the-shoulder top (item → try-on) | `out/red_top/final_1080x1920.mp4` | 12.0s | none (no on-screen text) |
+| Green satin cami, reel 1 "the look" | `out/green_cami_look/final_1080x1920.mp4` | 7.2s | none (no on-screen text) |
+| Green satin cami, reel 2 "playful" | `out/green_cami_playful/final_1080x1920.mp4` | 8.4s | none (no on-screen text) |
 
 Each `out/<project>/` folder also has `contact_sheet.jpg` and `previews/`. Put "linked below" in the post caption, next to the shop tag.
 
@@ -103,6 +105,28 @@ Cut from `raw/proxy/clip_35307.mp4` (presenting the top in a green cami) and `ra
 | 8.4–9.6 | 4 | Turns to show the back |
 | 9.6–12.0 | 5 | Finale: steps closer, hair flip, arms open (the most energetic moment), easing push |
 
+## Green satin cami: two reels from four takes
+The four takes (`raw/proxy/clip_35428/29/32/37.mp4`) are cut into two reels with different hooks and no shared footage. Both use plain cuts on the beat at 100 BPM, original music, true as-filmed colour with `wb_lock`, and AI upscaling.
+
+**Reel 1, "the look"** (Em7 → Cmaj7 → D6)
+| Time | Shot |
+|---|---|
+| 0.0–2.4 | Full length: hands rise into her hair (drums enter at 2.4s) |
+| 2.4–3.6 | Side profile with a look back |
+| 3.6–4.8 | Turns to show the back |
+| 4.8–7.2 | Spin with a hair flip, landing in a pose (slight slow motion, easing push) |
+
+**Reel 2, "playful"** (Gmaj7 → Em7 → Cmaj7 → D7)
+| Time | Shot |
+|---|---|
+| 0.0–2.4 | Full length: hair touch into a hands-on-hips pose (stabilised) |
+| 2.4–3.6 | The one close-up: a lean-in pout |
+| 3.6–4.8 | Playful arm gesture |
+| 4.8–6.0 | Steps back into a pose |
+| 6.0–8.4 | Walks in and blows a kiss, ending on a close pout |
+
+**Stabilisation:** every shot was measured for camera movement against the static wall and wall art. Almost all were tripod-steady (under 1–2 px), so they're untouched. Reel 2's opening had about 4 px of rapid wobble, so it uses the renderer's `"stabilize": true`. That tripod-locks the shot to its first frame using background features only (frame edges and top band, away from the subject) and skips correction when the subject covers the background. It cut frame-to-frame jitter by about 60%.
+
 The camera was bumped slightly partway through the power strip's plugging section. The renderer corrects this automatically (feature-matched alignment to a reference frame, `align_ref` in the edit file) so the stop-motion stays rock-steady.
 
 ## Look
@@ -130,8 +154,10 @@ python3 scripts/render.py olive_top        # -> out/olive_top/final_1080x1920.mp
 python3 scripts/render.py polka_top_reveal # -> out/polka_top_reveal/final_1080x1920.mp4
 python3 scripts/render.py polka_top_angles # -> out/polka_top_angles/final_1080x1920.mp4
 python3 scripts/render.py red_top          # -> out/red_top/final_1080x1920.mp4
+python3 scripts/render.py green_cami_look  # -> out/green_cami_look/final_1080x1920.mp4
+python3 scripts/render.py green_cami_playful # -> out/green_cami_playful/final_1080x1920.mp4
 ```
-- `edit/<project>.json`: the timeline (source in/out, speed and ramps (`ramp_shape`: bell / in / out), zoom/center moves and easing, shared camera moves, alignment, `wb_lock` colour stabilisation, transitions, SFX)
+- `edit/<project>.json`: the timeline (source in/out, speed and ramps (`ramp_shape`: bell / in / out), zoom/center moves and easing, shared camera moves, alignment, `wb_lock` colour stabilisation, per-shot `stabilize`, transitions, SFX)
 - `type/<project>.html`: the title layout and animation, locked to the shot timing (an edit with `"typography": false` renders with no text; the overlay files are kept in case a title comes back)
 - `scripts/render.py`: cuts, ramps, zooms, alignment and transitions, then grades, composites the type and encodes
 - `scripts/render_type.js`: renders the type layer to transparent PNG frames with Playwright

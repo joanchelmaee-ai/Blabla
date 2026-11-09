@@ -1,0 +1,17 @@
+{
+  "fps": 30,
+  "size": [1080, 1920],
+  "typography": false,
+  "wb_lock": {"region": [0.60, 0.05, 0.78, 0.12], "ref_src": "t37", "ref_t": 12.0, "luma_strength": 0.5},
+  "music": {"bpm": 100, "kick_from_beat": 4,
+            "chords": [["G3", "B3", "D4", "F#4"], ["E3", "G3", "B3", "D4"], ["C3", "E3", "G3", "B3"], ["D3", "F#3", "A3", "C4"]]},
+  "sources": {"t28": "raw/proxy/clip_35428.mp4", "t29": "raw/proxy/clip_35429.mp4", "t32": "raw/proxy/clip_35432.mp4", "t37": "raw/proxy/clip_35437.mp4"},
+  "shots": [
+    {"id": "hair_touch", "src": "t37", "in": 23.30, "speed": 1.0,  "dur": 2.40, "zoom": [1.03, 1.05], "center": [0.5, 0.5], "stabilize": true},
+    {"id": "lean_in",    "src": "t37", "in": 19.70, "speed": 1.0,  "dur": 1.20, "zoom": [1.0, 1.02],  "center": [0.5, 0.45]},
+    {"id": "arm",        "src": "t32", "in": 23.70, "speed": 1.0,  "dur": 1.20, "zoom": [1.04, 1.05], "center": [0.5, 0.5]},
+    {"id": "step_back",  "src": "t28", "in": 8.40,  "speed": 1.0,  "dur": 1.20, "zoom": [1.03, 1.04], "center": [0.5, 0.5]},
+    {"id": "kiss",       "src": "t29", "in": 12.95, "speed": 0.92, "dur": 2.40, "zoom": [1.0, 1.03],  "ease": "out", "center": [0.5, 0.45]}
+  ],
+  "sfx": []
+}
