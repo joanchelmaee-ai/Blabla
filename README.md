@@ -14,6 +14,7 @@ Minimal, editorial TikTok affiliate edits (1080×1920, 30 fps): a soft shared gr
 | Red off-the-shoulder top (item → try-on) | `out/red_top/final_1080x1920.mp4` | 12.0s | none (no on-screen text) |
 | Green satin cami, reel 1 "the look" | `out/green_cami_look/final_1080x1920.mp4` | 7.2s | none (no on-screen text) |
 | Green satin cami, reel 2 "playful" | `out/green_cami_playful/final_1080x1920.mp4` | 8.4s | none (no on-screen text) |
+| Printed halter top | `out/print_halter/final_1080x1920.mp4` | 9.6s | none (no on-screen text) |
 
 Each `out/<project>/` folder also has `contact_sheet.jpg` and `previews/`. Put "linked below" in the post caption, next to the shop tag.
 
@@ -127,6 +128,18 @@ The four takes (`raw/proxy/clip_35428/29/32/37.mp4`) are cut into two reels with
 
 **Stabilisation:** every shot was measured for camera movement against the static wall and wall art. Almost all were tripod-steady (under 1–2 px), so they're untouched. Reel 2's opening had about 4 px of rapid wobble, so it uses the renderer's `"stabilize": true`. That tripod-locks the shot to its first frame using background features only (frame edges and top band, away from the subject) and skips correction when the subject covers the background. It cut frame-to-frame jitter by about 60%.
 
+## Printed halter top: one reel from three takes
+Takes `raw/proxy/clip_35420/21/25.mp4` mostly repeat one hands-on-hips pose, so they become a single reel built from the distinct moments. Plain cuts on the beat at 100 BPM, original music (B♭maj7 → Am7 → Gm7 → C7), true as-filmed colour with `wb_lock`, and AI upscaling.
+
+| Time | Shot |
+|---|---|
+| 0.0–2.4 | Full length: steps back as her hands go into her hair (stabilised: the only shot with measurable jitter) |
+| 2.4–3.6 | Hand-under-chin pose (drums enter) |
+| 3.6–4.8 | Over-the-shoulder turn |
+| 4.8–6.0 | Playful arm gesture |
+| 6.0–7.2 | Steps closer, hands on hips: the print at its closest (no artificial crop) |
+| 7.2–9.6 | Waves and walks into the lens with a smile (slight slow motion, easing push) |
+
 The camera was bumped slightly partway through the power strip's plugging section. The renderer corrects this automatically (feature-matched alignment to a reference frame, `align_ref` in the edit file) so the stop-motion stays rock-steady.
 
 ## Look
@@ -156,6 +169,7 @@ python3 scripts/render.py polka_top_angles # -> out/polka_top_angles/final_1080x
 python3 scripts/render.py red_top          # -> out/red_top/final_1080x1920.mp4
 python3 scripts/render.py green_cami_look  # -> out/green_cami_look/final_1080x1920.mp4
 python3 scripts/render.py green_cami_playful # -> out/green_cami_playful/final_1080x1920.mp4
+python3 scripts/render.py print_halter     # -> out/print_halter/final_1080x1920.mp4
 ```
 - `edit/<project>.json`: the timeline (source in/out, speed and ramps (`ramp_shape`: bell / in / out), zoom/center moves and easing, shared camera moves, alignment, `wb_lock` colour stabilisation, per-shot `stabilize`, transitions, SFX)
 - `type/<project>.html`: the title layout and animation, locked to the shot timing (an edit with `"typography": false` renders with no text; the overlay files are kept in case a title comes back)
