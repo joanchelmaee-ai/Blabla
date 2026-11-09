@@ -16,6 +16,7 @@ Minimal, editorial TikTok affiliate edits (1080×1920, 30 fps): a soft shared gr
 | Green satin cami, reel 2 "playful" | `out/green_cami_playful/final_1080x1920.mp4` | 8.4s | none (no on-screen text) |
 | Printed halter top | `out/print_halter/final_1080x1920.mp4` | 9.6s | none (no on-screen text) |
 | Black tee + denim mini skirt | `out/black_tee_denim/final_1080x1920.mp4` | 8.4s | none (no on-screen text) |
+| Cream cardigan + bandeau + black mini | `out/cream_cardigan/final_1080x1920.mp4` | 9.6s | none (no on-screen text) |
 
 Each `out/<project>/` folder also has `contact_sheet.jpg` and `previews/`. Put "linked below" in the post caption, next to the shop tag.
 
@@ -152,6 +153,18 @@ Takes `raw/proxy/clip_35447/50/52/54.mp4` repeat one routine, so they become a s
 | 4.8–6.0 | Steps closer, hands on hips: fit of the tee and skirt |
 | 6.0–8.4 | Turns and lands on an over-the-shoulder look-back, showing the skirt from behind (easing into motion-interpolated slow motion) |
 
+## Cream cardigan + white bandeau + black mini skirt: one reel from two takes
+Cut from `raw/proxy/clip_35507.mp4` and `raw/proxy/clip_35510.mp4`. Plain cuts on the beat at 100 BPM, warm original music (A♭maj7 → Fm7 → D♭maj7 → E♭6), true as-filmed colour, and AI upscaling. `wb_lock` also evens out the camera's auto-exposure dips when she steps close.
+
+| Time | Shot |
+|---|---|
+| 0.0–2.4 | Swings the cardigan open, moving from the first frame (stabilised) |
+| 2.4–3.6 | The one close-up: holding the cardigan open to show the layering (drums enter) |
+| 3.6–4.8 | Turns with an over-the-shoulder look |
+| 4.8–6.0 | Medium, hands on hips: the fit |
+| 6.0–7.2 | Spin with hair and cardigan flaring (slight slow motion) |
+| 7.2–9.6 | Playful leg-pop pose, rising into the final pose |
+
 The camera was bumped slightly partway through the power strip's plugging section. The renderer corrects this automatically (feature-matched alignment to a reference frame, `align_ref` in the edit file) so the stop-motion stays rock-steady.
 
 ## Look
@@ -183,6 +196,7 @@ python3 scripts/render.py green_cami_look  # -> out/green_cami_look/final_1080x1
 python3 scripts/render.py green_cami_playful # -> out/green_cami_playful/final_1080x1920.mp4
 python3 scripts/render.py print_halter     # -> out/print_halter/final_1080x1920.mp4
 python3 scripts/render.py black_tee_denim  # -> out/black_tee_denim/final_1080x1920.mp4
+python3 scripts/render.py cream_cardigan   # -> out/cream_cardigan/final_1080x1920.mp4
 ```
 - `edit/<project>.json`: the timeline (source in/out, speed and ramps (`ramp_shape`: bell / in / out), zoom/center moves and easing, shared camera moves, alignment, `wb_lock` colour stabilisation, per-shot `stabilize`, transitions, SFX)
 - `type/<project>.html`: the title layout and animation, locked to the shot timing (an edit with `"typography": false` renders with no text; the overlay files are kept in case a title comes back)

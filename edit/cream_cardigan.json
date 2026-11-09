@@ -1,0 +1,18 @@
+{
+  "fps": 30,
+  "size": [1080, 1920],
+  "typography": false,
+  "wb_lock": {"region": [0.60, 0.05, 0.78, 0.12], "ref_src": "t10", "ref_t": 12.0, "luma_strength": 0.5},
+  "music": {"bpm": 100, "kick_from_beat": 4,
+            "chords": [["G#3", "C4", "D#4", "G4"], ["F3", "G#3", "C4", "D#4"], ["C#4", "F4", "G#4", "C5"], ["D#3", "G3", "A#3", "C4"]]},
+  "sources": {"t07": "raw/proxy/clip_35507.mp4", "t10": "raw/proxy/clip_35510.mp4"},
+  "shots": [
+    {"id": "swing",     "src": "t07", "in": 1.50,  "speed": 1.0,  "dur": 2.40, "zoom": [1.04, 1.05], "center": [0.5, 0.5], "stabilize": true},
+    {"id": "cardigan",  "src": "t07", "in": 10.40, "speed": 1.0,  "dur": 1.20, "zoom": [1.02, 1.03], "center": [0.5, 0.5]},
+    {"id": "look_back", "src": "t10", "in": 10.30, "speed": 1.0,  "dur": 1.20, "zoom": [1.04, 1.05], "center": [0.5, 0.5]},
+    {"id": "fit",       "src": "t07", "in": 25.00, "speed": 1.0,  "dur": 1.20, "zoom": [1.03, 1.04], "center": [0.5, 0.5]},
+    {"id": "spin",      "src": "t07", "in": 15.90, "speed": 0.85, "dur": 1.20, "zoom": [1.04, 1.05], "center": [0.5, 0.5]},
+    {"id": "leg_pop",   "src": "t10", "in": 16.60, "speed": 1.0,  "dur": 2.40, "zoom": [1.03, 1.06], "ease": "out", "center": [0.5, 0.5]}
+  ],
+  "sfx": []
+}
