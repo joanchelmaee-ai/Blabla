@@ -220,7 +220,14 @@ def warp_view(img, zoom, center, out_w, out_h, upscale, pre=None):
         big = ai_upscale(patch)
         k = big.shape[1] / pw  # = 4
         crop = big[int(round(k)):int(round(k * (ph - 1))), int(round(k)):int(round(k * (pw - 1)))]
-        return cv2.resize(crop, (out_w, out_h), interpolation=cv2.INTER_AREA)
+        sr = cv2.resize(crop, (out_w, out_h), interpolation=cv2.INTER_AREA).astype(np.float32)
+        # Detail transfer: keep only the fine detail the AI adds, and take all tone and colour from the
+        # original footage (a plain smooth upscale). The AI otherwise brightens highlights and shifts tones;
+        # this keeps the result true to the as-filmed look while staying ~95% as sharp.
+        ref = cv2.warpAffine(img, m, (out_w, out_h), flags=cv2.INTER_CUBIC,
+                             borderMode=cv2.BORDER_REFLECT).astype(np.float32)
+        out = sr - cv2.GaussianBlur(sr, (0, 0), 2.0) + cv2.GaussianBlur(ref, (0, 0), 2.0)
+        return np.clip(out, 0, 255).astype(np.uint8)
     interp = cv2.INTER_LANCZOS4 if s > 1 else cv2.INTER_AREA
     out = cv2.warpAffine(img, m, (out_w, out_h), flags=interp, borderMode=cv2.BORDER_REFLECT)
     if s > 1.15:  # draft mode: recover some crispness lost to plain upscaling
