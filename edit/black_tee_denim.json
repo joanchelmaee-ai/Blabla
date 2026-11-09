@@ -1,0 +1,18 @@
+{
+  "fps": 30,
+  "size": [1080, 1920],
+  "typography": false,
+  "wb_lock": {"region": [0.60, 0.05, 0.78, 0.12], "ref_src": "t50", "ref_t": 10.0, "luma_strength": 0.5},
+  "music": {"bpm": 100, "kick_from_beat": 4,
+            "chords": [["E3", "G#3", "B3", "D#4"], ["C#3", "E3", "G#3", "B3"], ["A3", "C#4", "E4", "G#4"], ["B3", "D#4", "F#4", "G#4"]]},
+  "sources": {"t47": "raw/proxy/clip_35447.mp4", "t50": "raw/proxy/clip_35450.mp4", "t52": "raw/proxy/clip_35452.mp4"},
+  "shots": [
+    {"id": "hair",       "src": "t52", "in": 2.40,  "speed": 1.0, "dur": 2.40, "zoom": [1.03, 1.05], "center": [0.5, 0.5]},
+    {"id": "frame_face", "src": "t50", "in": 15.00, "speed": 1.0, "dur": 1.20, "zoom": [1.04, 1.05], "center": [0.5, 0.5]},
+    {"id": "arm_pose",   "src": "t52", "in": 12.85, "speed": 1.0, "dur": 1.20, "zoom": [1.04, 1.05], "center": [0.5, 0.5]},
+    {"id": "closer",     "src": "t50", "in": 17.40, "speed": 1.0, "dur": 1.20, "zoom": [1.03, 1.04], "center": [0.5, 0.5]},
+    {"id": "look_back",  "src": "t47", "in": 5.10,  "out": 6.55, "ramp_shape": "out", "ramp": 0.45, "dur": 2.40,
+     "zoom": [1.03, 1.07], "ease": "out", "center": [0.5, 0.48]}
+  ],
+  "sfx": []
+}

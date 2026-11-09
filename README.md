@@ -15,6 +15,7 @@ Minimal, editorial TikTok affiliate edits (1080×1920, 30 fps): a soft shared gr
 | Green satin cami, reel 1 "the look" | `out/green_cami_look/final_1080x1920.mp4` | 7.2s | none (no on-screen text) |
 | Green satin cami, reel 2 "playful" | `out/green_cami_playful/final_1080x1920.mp4` | 8.4s | none (no on-screen text) |
 | Printed halter top | `out/print_halter/final_1080x1920.mp4` | 9.6s | none (no on-screen text) |
+| Black tee + denim mini skirt | `out/black_tee_denim/final_1080x1920.mp4` | 8.4s | none (no on-screen text) |
 
 Each `out/<project>/` folder also has `contact_sheet.jpg` and `previews/`. Put "linked below" in the post caption, next to the shop tag.
 
@@ -140,6 +141,17 @@ Takes `raw/proxy/clip_35420/21/25.mp4` mostly repeat one hands-on-hips pose, so 
 | 6.0–7.2 | Steps closer, hands on hips: the print at its closest (no artificial crop) |
 | 7.2–9.6 | Waves and walks into the lens with a smile (slight slow motion, easing push) |
 
+## Black tee + denim mini skirt: one reel from four takes
+Takes `raw/proxy/clip_35447/50/52/54.mp4` repeat one routine, so they become a single reel with the best version of each distinct moment. Plain cuts on the beat at 100 BPM, original music (Emaj7 → C♯m7 → Amaj7 → B6), true as-filmed colour with `wb_lock`, and AI upscaling. All shots measured tripod-steady (under 0.25 px jitter), so none are stabilised.
+
+| Time | Shot |
+|---|---|
+| 0.0–2.4 | Full length: hands go into her hair |
+| 2.4–3.6 | Playful hand-frame gesture (drums enter) |
+| 3.6–4.8 | Arm-across pose |
+| 4.8–6.0 | Steps closer, hands on hips: fit of the tee and skirt |
+| 6.0–8.4 | Turns and lands on an over-the-shoulder look-back, showing the skirt from behind (easing into motion-interpolated slow motion) |
+
 The camera was bumped slightly partway through the power strip's plugging section. The renderer corrects this automatically (feature-matched alignment to a reference frame, `align_ref` in the edit file) so the stop-motion stays rock-steady.
 
 ## Look
@@ -170,6 +182,7 @@ python3 scripts/render.py red_top          # -> out/red_top/final_1080x1920.mp4
 python3 scripts/render.py green_cami_look  # -> out/green_cami_look/final_1080x1920.mp4
 python3 scripts/render.py green_cami_playful # -> out/green_cami_playful/final_1080x1920.mp4
 python3 scripts/render.py print_halter     # -> out/print_halter/final_1080x1920.mp4
+python3 scripts/render.py black_tee_denim  # -> out/black_tee_denim/final_1080x1920.mp4
 ```
 - `edit/<project>.json`: the timeline (source in/out, speed and ramps (`ramp_shape`: bell / in / out), zoom/center moves and easing, shared camera moves, alignment, `wb_lock` colour stabilisation, per-shot `stabilize`, transitions, SFX)
 - `type/<project>.html`: the title layout and animation, locked to the shot timing (an edit with `"typography": false` renders with no text; the overlay files are kept in case a title comes back)
