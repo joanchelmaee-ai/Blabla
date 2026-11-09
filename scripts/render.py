@@ -430,7 +430,15 @@ def shot_frames(spec, reader, edl, tl, info=None):
         if wb:
             g = wb_gains(src, wb, target)
             gains = g if gains is None else 0.75 * gains + 0.25 * g  # smooth so the lock never pumps
-            src = np.clip(src.astype(np.float32) * gains, 0, 255).astype(np.uint8)
+            # Highlight protection: never let the correction push the frame's brightest detail (white tops,
+            # bright fabric) into clipping. The boost is capped so the 99.7th-percentile channel value stays
+            # at or below 246, but the gain is never taken below 1.0, so a frame is never darkened.
+            peak = float(np.percentile(src[::4, ::4].max(axis=2), 99.7)) + 1e-3
+            limit = 246.0 / peak
+            applied = gains
+            if gains.max() > limit:
+                applied = gains * (max(limit, 1.0) / gains.max())
+            src = np.clip(src.astype(np.float32) * applied, 0, 255).astype(np.uint8)
         frame_pre = pre
         if spec.get("stabilize"):
             if stab is None:

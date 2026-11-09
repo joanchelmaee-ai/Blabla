@@ -168,7 +168,7 @@ Cut from `raw/proxy/clip_35507.mp4` and `raw/proxy/clip_35510.mp4`. Plain cuts o
 The camera was bumped slightly partway through the power strip's plugging section. The renderer corrects this automatically (feature-matched alignment to a reference frame, `align_ref` in the edit file) so the stop-motion stays rock-steady.
 
 ## Look
-- **Colour: no filter.** Footage keeps its true, as-filmed colours. There is no colour grade and no added grain; the only colour correction is `wb_lock`, which holds each shot to its own reference frame and cancels the phone's auto white-balance flicker. Optional looks remain available per edit (`"grade": "edit/grade.txt"` or `edit/grade_natural.txt`) but are off everywhere.
+- **Colour: no filter.** Footage keeps its true, as-filmed colours. There is no colour grade and no added grain; the only colour correction is `wb_lock`, which holds each shot to its own reference frame and cancels the phone's auto white-balance flicker. `wb_lock` has highlight protection: when it lifts a frame the camera auto-darkened (e.g. as she steps close), the lift is capped so the brightest detail (white tops, bright fabric) never clips, and a frame is never darkened. Optional looks remain available per edit (`"grade": "edit/grade.txt"` or `edit/grade_natural.txt`) but are off everywhere.
 - **Fonts** (`type/fonts`, all OFL licensed): Pinyon Script for the cursive line, and Montserrat as a stand-in for Gotham on the lowercase line. To use real Gotham, drop the file in and edit its `@font-face` rule in `type/<project>.html`.
 - **Audio:** a silent-ready bed (room tone, soft clinks or plug clicks as items appear, airy whooshes on transitions), kept low so a trending sound added in the TikTok app sits on top.
 
