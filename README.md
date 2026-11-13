@@ -19,6 +19,7 @@ Minimal, editorial TikTok affiliate edits (1080×1920, 30 fps): a soft shared gr
 | Cream cardigan + bandeau + black mini | `out/cream_cardigan/final_1080x1920.mp4` | 9.6s | none (no on-screen text) |
 | White draped top + black shorts | `out/white_drape_top/final_1080x1920.mp4` | 8.4s | none (no on-screen text) |
 | Pink button-up shirt (throw-on → styled two ways) | `out/pink_shirt/final_1080x1920.mp4` | 12.0s | none (no on-screen text) |
+| Wide-leg pants, denim + black ("two colours") | `out/wide_leg_pants/final_1080x1920.mp4` | 13.2s | none (no on-screen text) |
 
 Each `out/<project>/` folder also has `contact_sheet.jpg` and `previews/`. Put "linked below" in the post caption, next to the shop tag.
 
@@ -194,6 +195,22 @@ Cut from four takes from two shoots: `raw/proxy/clip_n122356.mp4` (putting it on
 
 Revision 2: the ending no longer walks into the lens (it closed on a soft, face-filling close-up). It now lands on a full-length pose showing the whole outfit. The static 2.4s reveal is halved, and a playful gesture shot was added to keep the middle moving.
 
+## Wide-leg pants in two colours: hold-up → try-on (TikTok affiliate cut)
+Cut from `raw/proxy/clip_n122401.mp4` (holding both pairs up to camera) and the try-on takes `clip_n122350.mp4` (light-wash denim) and `clip_n122344/46.mp4` (black). Story: the product, then each colour held up and cut on the beat to her wearing it. That answers "how do they look on?" for both colours. No text, true as-filmed colour (product colours accurate) with `wb_lock`, AI upscaling with detail transfer, and original music (Dm7 → G7 → Cmaj7 → Am7, drums drop on the first try-on). All shots measured tripod-steady.
+
+| Time | Shot |
+|---|---|
+| 0.0–1.2 | Holds both pairs up to camera (fast → slow ramp) |
+| 1.2–2.4 | Light-wash jeans held fully spread: cut, length, wide leg |
+| 2.4–3.6 | Cut to wearing them, hands in pockets (drums drop) |
+| 3.6–4.8 | Side pose, leg forward: the wide-leg silhouette |
+| 4.8–6.0 | Hair touch: the full look |
+| 6.0–7.2 | Black pair held fully spread |
+| 7.2–8.4 | Wearing the black pair, hands in hair |
+| 8.4–9.6 | Leg-out pose: the wide leg swings |
+| 9.6–10.8 | Back view: rear fit |
+| 10.8–13.2 | Side profile turning to front, landing in a confident hands-on-hips pose (slight slow motion, easing push) |
+
 The camera was bumped slightly partway through the power strip's plugging section. The renderer corrects this automatically (feature-matched alignment to a reference frame, `align_ref` in the edit file) so the stop-motion stays rock-steady.
 
 ## Look
@@ -228,6 +245,7 @@ python3 scripts/render.py black_tee_denim  # -> out/black_tee_denim/final_1080x1
 python3 scripts/render.py cream_cardigan   # -> out/cream_cardigan/final_1080x1920.mp4
 python3 scripts/render.py white_drape_top  # -> out/white_drape_top/final_1080x1920.mp4
 python3 scripts/render.py pink_shirt       # -> out/pink_shirt/final_1080x1920.mp4
+python3 scripts/render.py wide_leg_pants   # -> out/wide_leg_pants/final_1080x1920.mp4
 ```
 - `edit/<project>.json`: the timeline (source in/out, speed and ramps (`ramp_shape`: bell / in / out), zoom/center moves and easing, shared camera moves, alignment, `wb_lock` colour stabilisation, per-shot `stabilize`, transitions, SFX)
 - `type/<project>.html`: the title layout and animation, locked to the shot timing (an edit with `"typography": false` renders with no text; the overlay files are kept in case a title comes back)

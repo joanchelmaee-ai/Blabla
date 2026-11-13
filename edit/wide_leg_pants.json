@@ -1,0 +1,23 @@
+{
+  "fps": 30,
+  "size": [1080, 1920],
+  "typography": false,
+  "wb_lock": {"region": [0.60, 0.05, 0.78, 0.12], "ref_src": "jeans", "ref_t": 69.6, "luma_strength": 0.5},
+  "music": {"bpm": 100, "kick_from_beat": 4,
+            "chords": [["D3", "F3", "A3", "C4"], ["G3", "B3", "D4", "F4"], ["C4", "E4", "G4", "B4"], ["A3", "C4", "E4", "G4"]]},
+  "sources": {"hold": "raw/proxy/clip_n122401.mp4", "jeans": "raw/proxy/clip_n122350.mp4",
+              "black_a": "raw/proxy/clip_n122344.mp4", "black_b": "raw/proxy/clip_n122346.mp4"},
+  "shots": [
+    {"id": "both",       "src": "hold",    "in": 0.40,  "out": 2.20, "ramp_shape": "out", "ramp": 0.4, "dur": 1.20, "zoom": [1.04, 1.04], "center": [0.5, 0.5]},
+    {"id": "jeans_up",   "src": "hold",    "in": 18.40, "speed": 1.0,  "dur": 1.20, "zoom": [1.03, 1.05], "center": [0.5, 0.5]},
+    {"id": "pockets",    "src": "jeans",   "in": 69.00, "speed": 1.0,  "dur": 1.20, "zoom": [1.04, 1.05], "center": [0.5, 0.5]},
+    {"id": "jeans_leg",  "src": "jeans",   "in": 77.60, "speed": 1.0,  "dur": 1.20, "zoom": [1.04, 1.05], "center": [0.5, 0.5]},
+    {"id": "jeans_hair", "src": "jeans",   "in": 83.80, "speed": 1.0,  "dur": 1.20, "zoom": [1.03, 1.04], "center": [0.5, 0.5]},
+    {"id": "black_up",   "src": "hold",    "in": 54.00, "speed": 1.0,  "dur": 1.20, "zoom": [1.03, 1.05], "center": [0.5, 0.5]},
+    {"id": "black_hair", "src": "black_b", "in": 28.60, "speed": 1.0,  "dur": 1.20, "zoom": [1.04, 1.05], "center": [0.5, 0.5]},
+    {"id": "swish",      "src": "black_a", "in": 10.20, "speed": 1.0,  "dur": 1.20, "zoom": [1.04, 1.05], "center": [0.5, 0.5]},
+    {"id": "back",       "src": "black_a", "in": 22.20, "speed": 1.0,  "dur": 1.20, "zoom": [1.04, 1.05], "center": [0.5, 0.5]},
+    {"id": "finale",     "src": "black_b", "in": 39.20, "speed": 0.85, "dur": 2.40, "zoom": [1.03, 1.07], "ease": "out", "center": [0.5, 0.48]}
+  ],
+  "sfx": []
+}
