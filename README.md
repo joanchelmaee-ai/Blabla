@@ -18,6 +18,7 @@ Minimal, editorial TikTok affiliate edits (1080×1920, 30 fps): a soft shared gr
 | Black tee + denim mini skirt | `out/black_tee_denim/final_1080x1920.mp4` | 8.4s | none (no on-screen text) |
 | Cream cardigan + bandeau + black mini | `out/cream_cardigan/final_1080x1920.mp4` | 9.6s | none (no on-screen text) |
 | White draped top + black shorts | `out/white_drape_top/final_1080x1920.mp4` | 8.4s | none (no on-screen text) |
+| Pink button-up shirt (throw-on → styled two ways) | `out/pink_shirt/final_1080x1920.mp4` | 12.0s | none (no on-screen text) |
 
 Each `out/<project>/` folder also has `contact_sheet.jpg` and `previews/`. Put "linked below" in the post caption, next to the shop tag.
 
@@ -177,6 +178,19 @@ Cut from `raw/proxy/clip_35519.mp4` and `raw/proxy/clip_35611.mp4`. Plain cuts o
 | 4.8–6.0 | Hand-to-shoulder pose |
 | 6.0–8.4 | Closer, relaxed hands-in-hair final pose (easing push) |
 
+## Pink button-up shirt: throw-on → styled two ways (TikTok affiliate cut)
+Cut from four takes from two shoots: `raw/proxy/clip_n122356.mp4` (putting it on over a white bandeau, 60 fps) and `clip_n122535/36/37.mp4` (wearing it buttoned). It's built for retention: motion from frame 1, a speed-ramped "throw-on", a satisfying buttoning close-up, and the beat drop landing on the finished look. That shows the shirt worn two ways (open as a layer, buttoned as a top), which makes it easy for viewers to picture owning it. No text, true as-filmed colour (`wb_lock` matches the two shoots), AI upscaling with detail transfer, and original music (Fmaj7 → G6 → Em7 → Am7, drums enter on the reveal).
+
+| Time | Shot | Edit |
+|---|---|---|
+| 0.0–2.4 | Holds the shirt around her shoulders, steps back and throws it on | slow → 4.8× → slow speed ramp (real shutter blur) |
+| 2.4–3.6 | Worn open over the bandeau, hands in hair | real speed |
+| 3.6–4.8 | Close-up on her hands doing up the buttons | slow → fast ramp into the drop |
+| 4.8–7.2 | Match cut to the finished buttoned look, hands on hips (drums drop) | stabilised |
+| 7.2–8.4 | Turns to show the back and the boxy fit | real speed |
+| 8.4–9.6 | Hands at the collar: fabric and collar detail | gentle close-up |
+| 9.6–12.0 | Walks into the lens with a hair touch | slight slow motion, easing push |
+
 The camera was bumped slightly partway through the power strip's plugging section. The renderer corrects this automatically (feature-matched alignment to a reference frame, `align_ref` in the edit file) so the stop-motion stays rock-steady.
 
 ## Look
@@ -210,6 +224,7 @@ python3 scripts/render.py print_halter     # -> out/print_halter/final_1080x1920
 python3 scripts/render.py black_tee_denim  # -> out/black_tee_denim/final_1080x1920.mp4
 python3 scripts/render.py cream_cardigan   # -> out/cream_cardigan/final_1080x1920.mp4
 python3 scripts/render.py white_drape_top  # -> out/white_drape_top/final_1080x1920.mp4
+python3 scripts/render.py pink_shirt       # -> out/pink_shirt/final_1080x1920.mp4
 ```
 - `edit/<project>.json`: the timeline (source in/out, speed and ramps (`ramp_shape`: bell / in / out), zoom/center moves and easing, shared camera moves, alignment, `wb_lock` colour stabilisation, per-shot `stabilize`, transitions, SFX)
 - `type/<project>.html`: the title layout and animation, locked to the shot timing (an edit with `"typography": false` renders with no text; the overlay files are kept in case a title comes back)
