@@ -2,19 +2,18 @@
   "fps": 30,
   "size": [1080, 1920],
   "typography": false,
-  "wb_lock": {"region": [0.60, 0.05, 0.78, 0.12], "ref_src": "worn", "ref_t": 3.0, "luma_strength": 0.5},
-  "music": {"bpm": 100, "kick_from_beat": 8,
-            "chords": [["F3", "A3", "C4", "E4"], ["G3", "B3", "D4", "E4"], ["E3", "G3", "B3", "D4"], ["A3", "C4", "E4", "G4"]]},
+  "wb_lock": {"region": [0.6, 0.05, 0.78, 0.12], "ref_src": "worn", "ref_t": 3.0, "luma_strength": 0.5},
+  "music": {"bpm": 100, "kick_from_beat": 8, "chords": [["F3", "A3", "C4", "E4"], ["G3", "B3", "D4", "E4"], ["E3", "G3", "B3", "D4"], ["A3", "C4", "E4", "G4"]]},
   "sources": {"on": "raw/proxy/clip_n122356.mp4", "worn": "raw/proxy/clip_n122535.mp4", "worn2": "raw/proxy/clip_n122537.mp4"},
   "shots": [
-    {"id": "throw_on", "src": "on",    "in": 0.00,  "out": 7.20, "ramp": 0.6, "dur": 2.40, "zoom": [1.03, 1.03], "center": [0.5, 0.5]},
-    {"id": "open_look","src": "on",    "in": 9.80,  "speed": 1.0, "dur": 1.20, "zoom": [1.04, 1.05], "center": [0.5, 0.5]},
-    {"id": "buttons",  "src": "on",    "in": 13.00, "out": 15.00, "ramp_shape": "in", "ramp": 0.4, "dur": 1.20,
-     "zoom": [1.45, 1.55], "center": [0.5, 0.47]},
-    {"id": "reveal",   "src": "worn",  "in": 2.00,  "speed": 1.0, "dur": 2.40, "zoom": [1.04, 1.06], "center": [0.5, 0.5], "stabilize": true},
-    {"id": "turn",     "src": "worn",  "in": 10.00, "speed": 1.0, "dur": 1.20, "zoom": [1.04, 1.05], "center": [0.5, 0.5]},
-    {"id": "collar",   "src": "worn2", "in": 13.00, "speed": 1.0, "dur": 1.20, "zoom": [1.18, 1.22], "center": [0.5, 0.42]},
-    {"id": "walk_in",  "src": "worn",  "in": 37.40, "speed": 0.9, "dur": 2.40, "zoom": [1.03, 1.07], "ease": "out", "center": [0.5, 0.45]}
+    {"id": "throw_on", "src": "on", "in": 0.0, "out": 7.2, "ramp": 0.6, "dur": 2.4, "zoom": [1.03, 1.03], "center": [0.5, 0.5]},
+    {"id": "open_look", "src": "on", "in": 9.8, "speed": 1.0, "dur": 1.2, "zoom": [1.04, 1.05], "center": [0.5, 0.5]},
+    {"id": "buttons", "src": "on", "in": 13.0, "out": 15.0, "ramp_shape": "in", "ramp": 0.4, "dur": 1.2, "zoom": [1.45, 1.55], "center": [0.5, 0.47]},
+    {"id": "reveal", "src": "worn", "in": 2.0, "speed": 1.0, "dur": 1.2, "zoom": [1.04, 1.05], "center": [0.5, 0.5], "stabilize": true},
+    {"id": "shoulder", "src": "worn2", "in": 23.4, "speed": 1.0, "dur": 1.2, "zoom": [1.04, 1.05], "center": [0.5, 0.5]},
+    {"id": "turn", "src": "worn", "in": 10.0, "speed": 1.0, "dur": 1.2, "zoom": [1.04, 1.05], "center": [0.5, 0.5]},
+    {"id": "collar", "src": "worn2", "in": 13.0, "speed": 1.0, "dur": 1.2, "zoom": [1.18, 1.22], "center": [0.5, 0.42]},
+    {"id": "finale", "src": "worn", "in": 11.8, "speed": 1.0, "dur": 2.4, "zoom": [1.03, 1.07], "ease": "out", "center": [0.5, 0.47]}
   ],
   "sfx": []
 }

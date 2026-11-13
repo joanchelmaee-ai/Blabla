@@ -186,10 +186,13 @@ Cut from four takes from two shoots: `raw/proxy/clip_n122356.mp4` (putting it on
 | 0.0–2.4 | Holds the shirt around her shoulders, steps back and throws it on | slow → 4.8× → slow speed ramp (real shutter blur) |
 | 2.4–3.6 | Worn open over the bandeau, hands in hair | real speed |
 | 3.6–4.8 | Close-up on her hands doing up the buttons | slow → fast ramp into the drop |
-| 4.8–7.2 | Match cut to the finished buttoned look, hands on hips (drums drop) | stabilised |
+| 4.8–6.0 | Match cut to the finished buttoned look, hands on hips (drums drop) | stabilised |
+| 6.0–7.2 | Playful hand-to-shoulder gesture (closer framing) | real speed |
 | 7.2–8.4 | Turns to show the back and the boxy fit | real speed |
 | 8.4–9.6 | Hands at the collar: fabric and collar detail | gentle close-up |
-| 9.6–12.0 | Walks into the lens with a hair touch | slight slow motion, easing push |
+| 9.6–12.0 | Turns from facing away back to camera and lands full length in a hand-in-hair, hands-on-hips pose | easing push |
+
+Revision 2: the ending no longer walks into the lens (it closed on a soft, face-filling close-up). It now lands on a full-length pose showing the whole outfit. The static 2.4s reveal is halved, and a playful gesture shot was added to keep the middle moving.
 
 The camera was bumped slightly partway through the power strip's plugging section. The renderer corrects this automatically (feature-matched alignment to a reference frame, `align_ref` in the edit file) so the stop-motion stays rock-steady.
 
