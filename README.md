@@ -20,6 +20,7 @@ Minimal, editorial TikTok affiliate edits (1080×1920, 30 fps): a soft shared gr
 | White draped top + black shorts | `out/white_drape_top/final_1080x1920.mp4` | 8.4s | none (no on-screen text) |
 | Pink button-up shirt (throw-on → styled two ways) | `out/pink_shirt/final_1080x1920.mp4` | 12.0s | none (no on-screen text) |
 | Wide-leg pants, denim + black ("two colours") | `out/wide_leg_pants/final_1080x1920.mp4` | 13.2s | none (no on-screen text) |
+| White draped top, try-on (Nov 13 shoot) | `out/white_drape_tryon/final_1080x1920.mp4` | 12.0s | none (no on-screen text) |
 
 Each `out/<project>/` folder also has `contact_sheet.jpg` and `previews/`. Put "linked below" in the post caption, next to the shop tag.
 
@@ -211,6 +212,21 @@ Cut from `raw/proxy/clip_n122401.mp4` (holding both pairs up to camera) and the 
 | 9.6–10.8 | Back view: rear fit |
 | 10.8–13.2 | Side profile turning to front, landing in a confident hands-on-hips pose (slight slow motion, easing push) |
 
+## White asymmetric draped top: flat → on → styled (TikTok affiliate cut, Nov 13 shoot)
+Cut from `raw/proxy/clip_n122358.mp4` (holding it up flat, pulling it on) and the wearing takes `clip_n122526/28/31.mp4`. The hook is curiosity: the top held up flat is an odd square shape, so viewers stay to see how it wears. It's pulled over her head in a speed ramp, and the beat drops on the styled look. No text, true colour with `wb_lock`, AI upscaling with detail transfer, no clipping on the white knit, and original music (Cmaj7 → Am7 → Fmaj7 → G7). All shots measured tripod-steady.
+
+| Time | Shot |
+|---|---|
+| 0.0–1.2 | Holds the top up flat: the square shape (fast → slow ramp) |
+| 1.2–2.4 | Pulls it over her head (slow → 4.8× → slow ramp) |
+| 2.4–3.6 | Cut to the styled look: hand-behind-head pose (drums drop) |
+| 3.6–4.8 | Hand on shoulder: the off-shoulder drape |
+| 4.8–6.0 | Side profile, hand on hip |
+| 6.0–7.2 | Hand in hair |
+| 7.2–8.4 | Close-up on the open-knit texture |
+| 8.4–9.6 | Turns to the back |
+| 9.6–12.0 | Turns to front and tugs the shoulder so the drape flows (easing push) |
+
 The camera was bumped slightly partway through the power strip's plugging section. The renderer corrects this automatically (feature-matched alignment to a reference frame, `align_ref` in the edit file) so the stop-motion stays rock-steady.
 
 ## Look
@@ -246,6 +262,7 @@ python3 scripts/render.py cream_cardigan   # -> out/cream_cardigan/final_1080x19
 python3 scripts/render.py white_drape_top  # -> out/white_drape_top/final_1080x1920.mp4
 python3 scripts/render.py pink_shirt       # -> out/pink_shirt/final_1080x1920.mp4
 python3 scripts/render.py wide_leg_pants   # -> out/wide_leg_pants/final_1080x1920.mp4
+python3 scripts/render.py white_drape_tryon # -> out/white_drape_tryon/final_1080x1920.mp4
 ```
 - `edit/<project>.json`: the timeline (source in/out, speed and ramps (`ramp_shape`: bell / in / out), zoom/center moves and easing, shared camera moves, alignment, `wb_lock` colour stabilisation, per-shot `stabilize`, transitions, SFX)
 - `type/<project>.html`: the title layout and animation, locked to the shot timing (an edit with `"typography": false` renders with no text; the overlay files are kept in case a title comes back)

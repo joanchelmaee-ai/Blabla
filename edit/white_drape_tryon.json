@@ -1,0 +1,22 @@
+{
+  "fps": 30,
+  "size": [1080, 1920],
+  "typography": false,
+  "wb_lock": {"region": [0.60, 0.05, 0.78, 0.12], "ref_src": "worn_a", "ref_t": 5.0, "luma_strength": 0.5},
+  "music": {"bpm": 100, "kick_from_beat": 4,
+            "chords": [["C3", "E3", "G3", "B3"], ["A2", "C3", "E3", "G3"], ["F3", "A3", "C4", "E4"], ["G3", "B3", "D4", "F4"]]},
+  "sources": {"on": "raw/proxy/clip_n122358.mp4", "worn_a": "raw/proxy/clip_n122531.mp4",
+              "worn_b": "raw/proxy/clip_n122528.mp4", "worn_c": "raw/proxy/clip_n122526.mp4"},
+  "shots": [
+    {"id": "flat",     "src": "on",     "in": 1.60,  "out": 3.60, "ramp_shape": "out", "ramp": 0.4, "dur": 1.20, "zoom": [1.04, 1.04], "center": [0.5, 0.5]},
+    {"id": "throw_on", "src": "on",     "in": 9.80,  "out": 12.60, "ramp": 0.6, "dur": 1.20, "zoom": [1.04, 1.04], "center": [0.5, 0.5]},
+    {"id": "reveal",   "src": "worn_a", "in": 0.20,  "speed": 1.0, "dur": 1.20, "zoom": [1.04, 1.05], "center": [0.5, 0.5]},
+    {"id": "shoulder", "src": "worn_b", "in": 17.00, "speed": 1.0, "dur": 1.20, "zoom": [1.04, 1.05], "center": [0.5, 0.5]},
+    {"id": "profile",  "src": "worn_a", "in": 10.60, "speed": 1.0, "dur": 1.20, "zoom": [1.04, 1.05], "center": [0.5, 0.5]},
+    {"id": "hair",     "src": "worn_b", "in": 18.80, "speed": 1.0, "dur": 1.20, "zoom": [1.04, 1.05], "center": [0.5, 0.5]},
+    {"id": "texture",  "src": "worn_c", "in": 4.00,  "speed": 1.0, "dur": 1.20, "zoom": [1.50, 1.60], "center": [0.5, 0.47]},
+    {"id": "turn",     "src": "on",     "in": 31.40, "speed": 1.0, "dur": 1.20, "zoom": [1.04, 1.05], "center": [0.5, 0.5]},
+    {"id": "finale",   "src": "worn_a", "in": 17.20, "speed": 1.0, "dur": 2.40, "zoom": [1.03, 1.07], "ease": "out", "center": [0.5, 0.48]}
+  ],
+  "sfx": []
+}
