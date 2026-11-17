@@ -22,6 +22,7 @@ Minimal, editorial TikTok affiliate edits (1080×1920, 30 fps): a soft shared gr
 | Wide-leg pants, denim + black ("two colours") | `out/wide_leg_pants/final_1080x1920.mp4` | 13.2s | none (no on-screen text) |
 | White draped top, try-on (Nov 13 shoot) | `out/white_drape_tryon/final_1080x1920.mp4` | 12.0s | none (no on-screen text) |
 | Oversized grey button-up shirt (worn open) | `out/grey_shirt/final_1080x1920.mp4` | 12.0s | none (no on-screen text) |
+| Light-wash baggy jeans + black tee | `out/baggy_jeans_tee/final_1080x1920.mp4` | 12.0s | none (no on-screen text) |
 
 Each `out/<project>/` folder also has `contact_sheet.jpg` and `previews/`. Put "linked below" in the post caption, next to the shop tag.
 
@@ -243,6 +244,20 @@ Cut from `raw/proxy/clip_n122538/39/41.mp4`. Plain beat-synced cuts at 100 BPM, 
 | 8.4–9.6 | Playful arm-out pose |
 | 9.6–12.0 | Turns from facing away to the front and settles holding the shirt (easing push) |
 
+## Light-wash baggy jeans + black fitted tee: pull-on → styled (TikTok affiliate cut)
+Cut from `raw/proxy/clip_n122434.mp4` (pulling the jeans on, 60 fps) and `clip_n122513/14.mp4`. The hook is the jeans going on in a speed ramp, and the drums drop on the first full look. No text, true colour with `wb_lock` (denim wash accurate), AI upscaling with detail transfer, and original music (Em7 → A7 → Dmaj7 → Bm7). The hands-in-hair step-back had about 1 px wobble and is stabilised; everything else measured tripod-steady.
+
+| Time | Shot |
+|---|---|
+| 0.0–2.4 | Pulls the jeans on and fastens them (slow → fast → slow ramp) |
+| 2.4–3.6 | Steps back with hands in her hair (drums drop, stabilised) |
+| 3.6–4.8 | Hands on hips: the full fit |
+| 4.8–6.0 | Turns to show the back |
+| 6.0–7.2 | Side-profile turn |
+| 7.2–8.4 | Close-up on the denim: wash and wide leg |
+| 8.4–9.6 | Hand in hair |
+| 9.6–12.0 | Steps toward camera into a confident hands-on-hips pose (easing push) |
+
 The camera was bumped slightly partway through the power strip's plugging section. The renderer corrects this automatically (feature-matched alignment to a reference frame, `align_ref` in the edit file) so the stop-motion stays rock-steady.
 
 ## Look
@@ -280,6 +295,7 @@ python3 scripts/render.py pink_shirt       # -> out/pink_shirt/final_1080x1920.m
 python3 scripts/render.py wide_leg_pants   # -> out/wide_leg_pants/final_1080x1920.mp4
 python3 scripts/render.py white_drape_tryon # -> out/white_drape_tryon/final_1080x1920.mp4
 python3 scripts/render.py grey_shirt       # -> out/grey_shirt/final_1080x1920.mp4
+python3 scripts/render.py baggy_jeans_tee  # -> out/baggy_jeans_tee/final_1080x1920.mp4
 ```
 - `edit/<project>.json`: the timeline (source in/out, speed and ramps (`ramp_shape`: bell / in / out), zoom/center moves and easing, shared camera moves, alignment, `wb_lock` colour stabilisation, per-shot `stabilize`, transitions, SFX)
 - `type/<project>.html`: the title layout and animation, locked to the shot timing (an edit with `"typography": false` renders with no text; the overlay files are kept in case a title comes back)
