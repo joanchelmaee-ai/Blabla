@@ -21,6 +21,7 @@ Minimal, editorial TikTok affiliate edits (1080×1920, 30 fps): a soft shared gr
 | Pink button-up shirt (throw-on → styled two ways) | `out/pink_shirt/final_1080x1920.mp4` | 12.0s | none (no on-screen text) |
 | Wide-leg pants, denim + black ("two colours") | `out/wide_leg_pants/final_1080x1920.mp4` | 13.2s | none (no on-screen text) |
 | White draped top, try-on (Nov 13 shoot) | `out/white_drape_tryon/final_1080x1920.mp4` | 12.0s | none (no on-screen text) |
+| Oversized grey button-up shirt (worn open) | `out/grey_shirt/final_1080x1920.mp4` | 12.0s | none (no on-screen text) |
 
 Each `out/<project>/` folder also has `contact_sheet.jpg` and `previews/`. Put "linked below" in the post caption, next to the shop tag.
 
@@ -227,6 +228,21 @@ Cut from `raw/proxy/clip_n122358.mp4` (holding it up flat, pulling it on) and th
 | 8.4–9.6 | Turns to the back |
 | 9.6–12.0 | Turns to front and tugs the shoulder so the drape flows (easing push) |
 
+## Oversized pale-grey button-up shirt, worn open (TikTok affiliate cut)
+Cut from `raw/proxy/clip_n122538/39/41.mp4`. Plain beat-synced cuts at 100 BPM, original music (Bm7 → Gmaj7 → Dmaj7 → A7, drums drop on the first full look), true colour with `wb_lock`, AI upscaling with detail transfer, no text. The opening and the hands-on-hips reveal had slight camera wobble and are stabilised; everything else measured tripod-steady.
+
+| Time | Shot |
+|---|---|
+| 0.0–1.2 | Shrugs the shirt open while stepping back (fast → slow ramp, stabilised) |
+| 1.2–2.4 | Holds the lapels: the oversized cut |
+| 2.4–3.6 | Full look, hands on hips (drums drop, stabilised) |
+| 3.6–4.8 | Hand in hair |
+| 4.8–6.0 | Sweeps her arm out: the sleeve swing |
+| 6.0–7.2 | Close-up on the shirt over the white top |
+| 7.2–8.4 | Side profile |
+| 8.4–9.6 | Playful arm-out pose |
+| 9.6–12.0 | Turns from facing away to the front and settles holding the shirt (easing push) |
+
 The camera was bumped slightly partway through the power strip's plugging section. The renderer corrects this automatically (feature-matched alignment to a reference frame, `align_ref` in the edit file) so the stop-motion stays rock-steady.
 
 ## Look
@@ -263,6 +279,7 @@ python3 scripts/render.py white_drape_top  # -> out/white_drape_top/final_1080x1
 python3 scripts/render.py pink_shirt       # -> out/pink_shirt/final_1080x1920.mp4
 python3 scripts/render.py wide_leg_pants   # -> out/wide_leg_pants/final_1080x1920.mp4
 python3 scripts/render.py white_drape_tryon # -> out/white_drape_tryon/final_1080x1920.mp4
+python3 scripts/render.py grey_shirt       # -> out/grey_shirt/final_1080x1920.mp4
 ```
 - `edit/<project>.json`: the timeline (source in/out, speed and ramps (`ramp_shape`: bell / in / out), zoom/center moves and easing, shared camera moves, alignment, `wb_lock` colour stabilisation, per-shot `stabilize`, transitions, SFX)
 - `type/<project>.html`: the title layout and animation, locked to the shot timing (an edit with `"typography": false` renders with no text; the overlay files are kept in case a title comes back)
