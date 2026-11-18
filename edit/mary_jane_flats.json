@@ -1,0 +1,20 @@
+{
+  "fps": 30,
+  "size": [1080, 1920],
+  "typography": false,
+  "wb_lock": {"region": [0.60, 0.05, 0.78, 0.12], "ref_src": "s", "ref_t": 37.0, "luma_strength": 0.5},
+  "music": {"bpm": 100, "kick_from_beat": 6,
+            "chords": [["F3", "A3", "C4", "E4"], ["D3", "F3", "A3", "C4"], ["A#3", "D4", "F4", "A4"], ["C4", "E4", "G4", "A#4"]]},
+  "sources": {"s": "raw/proxy/clip_n122440.mp4"},
+  "shots": [
+    {"id": "hold_up", "src": "s", "in": 1.40,  "out": 5.40, "ramp_shape": "out", "ramp": 0.45, "dur": 2.40, "zoom": [1.04, 1.10], "ease": "out", "center": [0.5, 0.55]},
+    {"id": "put_on",  "src": "s", "in": 10.40, "out": 15.20, "ramp": 0.6, "dur": 1.20, "zoom": [1.04, 1.04], "center": [0.5, 0.5]},
+    {"id": "reveal",  "src": "s", "in": 35.80, "speed": 1.0, "dur": 1.20, "zoom": [1.04, 1.06], "center": [0.5, 0.55]},
+    {"id": "kick",    "src": "s", "in": 39.60, "speed": 1.0, "dur": 1.20, "zoom": [1.04, 1.05], "center": [0.5, 0.55]},
+    {"id": "feet",    "src": "s", "in": 44.80, "speed": 1.0, "dur": 1.20, "zoom": [1.60, 1.66], "center": [0.5, 0.69]},
+    {"id": "hair",    "src": "s", "in": 50.00, "speed": 1.0, "dur": 1.20, "zoom": [1.04, 1.05], "center": [0.5, 0.5]},
+    {"id": "arms",    "src": "s", "in": 72.40, "speed": 1.0, "dur": 1.20, "zoom": [1.04, 1.05], "center": [0.5, 0.5]},
+    {"id": "walk",    "src": "s", "in": 46.00, "speed": 0.8, "dur": 2.40, "zoom": [1.03, 1.06], "ease": "out", "center": [0.5, 0.55]}
+  ],
+  "sfx": []
+}

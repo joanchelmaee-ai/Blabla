@@ -23,6 +23,7 @@ Minimal, editorial TikTok affiliate edits (1080×1920, 30 fps): a soft shared gr
 | White draped top, try-on (Nov 13 shoot) | `out/white_drape_tryon/final_1080x1920.mp4` | 12.0s | none (no on-screen text) |
 | Oversized grey button-up shirt (worn open) | `out/grey_shirt/final_1080x1920.mp4` | 12.0s | none (no on-screen text) |
 | Light-wash baggy jeans + black tee | `out/baggy_jeans_tee/final_1080x1920.mp4` | 12.0s | none (no on-screen text) |
+| Black patent Mary Jane flats | `out/mary_jane_flats/final_1080x1920.mp4` | 12.0s | none (no on-screen text) |
 
 Each `out/<project>/` folder also has `contact_sheet.jpg` and `previews/`. Put "linked below" in the post caption, next to the shop tag.
 
@@ -258,6 +259,22 @@ Cut from `raw/proxy/clip_n122434.mp4` (pulling the jeans on, 60 fps) and `clip_n
 | 8.4–9.6 | Hand in hair |
 | 9.6–12.0 | Steps toward camera into a confident hands-on-hips pose (easing push) |
 
+## Black patent Mary Jane flats: hold-up → slip on → walk (TikTok affiliate cut)
+Cut from `raw/proxy/clip_n122440.mp4` (60 fps), styled with the black tee + denim mini skirt outfit. The product is the shoes, so the cut prioritises them: a close-up hook, putting them on, full-length shots where the shoes are in frame, a feet close-up, and an ending walk in the shoes (the key thing a shoe buyer wants to see). The brand label is shown as-is. No text, true colour with `wb_lock`, AI upscaling with detail transfer, and original music (Fmaj7 → Dm7 → B♭maj7 → C7; drums drop on the full-length reveal). All shots measured tripod-steady.
+
+(The other four clips sent with this one, 12:25:09–12:25:12 PM, are byte-identical to the Nov 8 3:54:47–3:54:54 PM clips already used in `out/black_tee_denim/`, and don't show the shoes, since her feet are out of frame, so they aren't reused here.)
+
+| Time | Shot |
+|---|---|
+| 0.0–2.4 | Brings the shoes right up to the camera (fast → slow ramp, easing push) |
+| 2.4–3.6 | Slips them on (slow → fast → slow ramp) |
+| 3.6–4.8 | Full length wearing them, shoes in frame (drums drop) |
+| 4.8–6.0 | Side pose, kicks one foot back |
+| 6.0–7.2 | Close-up on her legs and feet: the shoes on, leg pop |
+| 7.2–8.4 | Hands in hair: the outfit |
+| 8.4–9.6 | Playful arm gesture |
+| 9.6–12.0 | Walks toward camera in the shoes (0.8× slow motion; shoes stay in frame to the end) |
+
 The camera was bumped slightly partway through the power strip's plugging section. The renderer corrects this automatically (feature-matched alignment to a reference frame, `align_ref` in the edit file) so the stop-motion stays rock-steady.
 
 ## Look
@@ -296,6 +313,7 @@ python3 scripts/render.py wide_leg_pants   # -> out/wide_leg_pants/final_1080x19
 python3 scripts/render.py white_drape_tryon # -> out/white_drape_tryon/final_1080x1920.mp4
 python3 scripts/render.py grey_shirt       # -> out/grey_shirt/final_1080x1920.mp4
 python3 scripts/render.py baggy_jeans_tee  # -> out/baggy_jeans_tee/final_1080x1920.mp4
+python3 scripts/render.py mary_jane_flats  # -> out/mary_jane_flats/final_1080x1920.mp4
 ```
 - `edit/<project>.json`: the timeline (source in/out, speed and ramps (`ramp_shape`: bell / in / out), zoom/center moves and easing, shared camera moves, alignment, `wb_lock` colour stabilisation, per-shot `stabilize`, transitions, SFX)
 - `type/<project>.html`: the title layout and animation, locked to the shot timing (an edit with `"typography": false` renders with no text; the overlay files are kept in case a title comes back)
